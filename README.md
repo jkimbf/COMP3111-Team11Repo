@@ -7,7 +7,7 @@
 > Task 2 & Task 3
 
 ## 2. HWANG, Junyeol
-> email: jhwangae@connect.ust.hk | github: Junyeol1998 | dev branch: Junyeol1998_dev
+> email: jhwangae@connect.ust.hk | github: Junyeol1998 | dev branch: Junyeol_dev
 
 > Task 1 & Task 6
 
