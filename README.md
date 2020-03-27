@@ -4,7 +4,7 @@
 ## 1. KIM, Jaehyeok
 > email: jkimbf | github: jkimbf | dev branch: not yet decided\
 
-> Task 2 & Task 4
+> Task 2 & Task 3
 
 ## 2. ...
 > email: ... | github: ... | dev branch: ...\
