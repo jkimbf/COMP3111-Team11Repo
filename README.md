@@ -6,10 +6,10 @@
 
 > Task 2 & Task 3
 
-## 2. ...
-> email: ... | github: ... | dev branch: ...
+## 2. HWANG, Junyeol
+> email: jhwangae@connect.ust.hk | github: Junyeol1998 | dev branch: Junyeol1998_dev
 
-> Task _ & Task _
+> Task 1 & Task 6
 
 ## 3. ...
 > email: ... | github: ... | dev branch: ...
