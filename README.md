@@ -12,6 +12,6 @@
 > Task 1 & Task 6
 
 ## 3. Yip Man Hong
-> email: mhyipad@connect.ust.hk | github: manhongyip | dev branch: ...
+> email: mhyipad@connect.ust.hk | github: manhongyip | dev branch: manhongyip_dev
 
 > Task 4 & Task 5
