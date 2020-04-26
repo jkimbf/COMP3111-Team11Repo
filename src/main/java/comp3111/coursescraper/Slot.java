@@ -11,6 +11,8 @@ public class Slot {
 	private LocalTime start;
 	private LocalTime end;
 	private String venue;
+	private String instructors[];
+	private int instNum;
 	public static final String DAYS[] = {"Mo", "Tu", "We", "Th", "Fr", "Sa"};
 	public static final Map<String, Integer> DAYS_MAP = new HashMap<String, Integer>();
 	static {
@@ -21,6 +23,8 @@ public class Slot {
 	@Override
 	public Slot clone() {
 		Slot s = new Slot();
+		s.instructors = this.instructors;
+		s.instNum = this.instNum;
 		s.day = this.day;
 		s.start = this.start;
 		s.end = this.end;
@@ -91,5 +95,34 @@ public class Slot {
 	public void setDay(int day) {
 		this.day = day;
 	}
+	
+	// initialize instructors
+	public void setInstructor(int size) {
+		instructors = new String[size];
+		instNum = 0;
+	}
+	
+	// Add instructor
+	public void addInstructor(String x) {
+		instructors[instNum] = x;
+		++instNum;
+	}
+	
+	public String getInstructor(int i) {
+		return instructors[i];
+	}
+	
+	public int getInstNum() {
+		return instNum;
+	}
+	
+	// Print instructors for debugging. Should be deleted later
+	public void printInst() {
+		for(String inst : instructors) {
+			System.out.println(inst);
+			System.out.println('\n');
+		}
+	}
+	
 
 }

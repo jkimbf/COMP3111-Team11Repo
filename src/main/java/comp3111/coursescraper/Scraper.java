@@ -85,11 +85,14 @@ public class Scraper {
 		client = new WebClient();
 		client.getOptions().setCssEnabled(false);
 		client.getOptions().setJavaScriptEnabled(false);
+
 	}
 
 	private void addSlot(HtmlElement e, Course c, boolean secondRow) {
 		String times[] =  e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
 		String venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
+		String IDCode[] = e.getChildNodes().get(secondRow ? 0 : 1).asText().split(" ");
+		String instructors[] = e.getChildNodes().get(secondRow ? 0 : 5).asText().split("\n");
 		if (times[0].equals("TBA"))
 			return;
 		for (int j = 0; j < times[0].length(); j+=2) {
@@ -101,20 +104,37 @@ public class Scraper {
 			s.setStart(times[1]);
 			s.setEnd(times[3]);
 			s.setVenue(venue);
-			c.addSlot(s);	
+			s.setInstructor(instructors.length);
+			for(String inst : instructors) {
+				// Delete unexpected "\n" before addition
+				if(instructors.length > 0 && inst != instructors[instructors.length-1]) {
+					s.addInstructor(inst.substring(0,inst.length()-1));
+				}
+				else {
+					s.addInstructor(inst);
+				}
+			}
+			c.addSlot(s);
+			
+			Section x = new Section();
+			x.setCode(IDCode[0]);
+			x.setID(IDCode[1]);
+			c.addSection(x);
 		}
 
 	}
 
+
 	public List<Course> scrape(String baseurl, String term, String sub) {
 
-		try {
-			
-			HtmlPage page = client.getPage(baseurl + "/" + term + "/subject/" + sub);
+		try {			
 
+			HtmlPage page = client.getPage(baseurl + "/" + term + "/subject/" + sub);
+			
 			
 			List<?> items = (List<?>) page.getByXPath("//div[@class='course']");
-			
+
+		
 			Vector<Course> result = new Vector<Course>();
 
 			for (int i = 0; i < items.size(); i++) {
@@ -139,8 +159,9 @@ public class Scraper {
 				for ( HtmlElement e: (List<HtmlElement>)sections) {
 					addSlot(e, c, false);
 					e = (HtmlElement)e.getNextSibling();
-					if (e != null && !e.getAttribute("class").contains("newsect"))
+					if (e != null && !e.getAttribute("class").contains("newsect")) {
 						addSlot(e, c, true);
+					}	
 				}
 				
 				result.add(c);
