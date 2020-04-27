@@ -134,6 +134,7 @@ public class Controller {
     	filterSearch();
     }
     
+    // Need to be changed
     @FXML
     void filterSearch() {
     	textAreaConsole.setText("");
