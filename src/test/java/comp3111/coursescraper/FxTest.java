@@ -37,11 +37,29 @@ public class FxTest extends ApplicationTest {
 
 	
 	@Test
-	public void testButton() {
+	public void testButtonTrue() {
 		clickOn("#tabSfq");
 		clickOn("#buttonInstructorSfq");
 		Button b = (Button)s.lookup("#buttonInstructorSfq");
 		sleep(1000);
 		assertTrue(b.isDisabled());
+	}
+	
+	@Test
+	public void testButtonFalse() {
+		//clickOn("#tabSfq");
+		//clickOn("#buttonInstructorSfq");
+		Button b = (Button)s.lookup("#buttonInstructorSfq");
+		sleep(1000);
+		assertFalse(b.isDisabled());
+	}
+	
+	@Test
+	public void testSelectAll() {
+		clickOn("#tabFilter");
+		clickOn("#selectAllButton");
+		Button b = (Button)s.lookup("#selectAllButton");
+		sleep(1000);
+		assertEquals(b.getText(), "De-select All");
 	}
 }
