@@ -16,4 +16,11 @@ public class ItemTest {
 		i.setTitle("ABCDE");
 		assertEquals(i.getTitle(), "ABCDE");
 	}
+	
+	@Test
+	public void testSetExclusion() {
+		Course i = new Course();
+		i.setExclusion("ABC");
+		assertEquals(i.getExclusion(), "ABC");
+	}
 }
