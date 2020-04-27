@@ -15,6 +15,13 @@ public class Course {
 	private int numSections;
 	private int actualNumSec;
 	
+	// SFQ variables
+	private String CourseOverallMean;
+	private String InstructorOverallMean;
+	private String Enrolment;
+	private String ResponseRate;
+	
+	
 	public Course() {
 		slots = new Slot[DEFAULT_MAX_SLOT];
 		for (int i = 0; i < DEFAULT_MAX_SLOT; i++) slots[i] = null;
@@ -112,6 +119,36 @@ public class Course {
 	// get the actual number of Sections
 	public int getNumSections() {
 		return actualNumSec;
+	}
+	
+	// set the Course Overall Mean
+	public void setCourseOverallMean(String CourseOverallMean) {
+		this.CourseOverallMean = CourseOverallMean;
+	}
+	
+	// get the Course Overall Mean
+	public String getCourseOverallMean() {
+		return CourseOverallMean;
+	}
+	
+	// set the Instructor Overall Mean
+	public void setInstructorOverallMean(String InstructorOverallMean) {
+		this.InstructorOverallMean = InstructorOverallMean;
+	}
+	
+	// get the Instructor Overall Mean
+	public String getInstructorOverallMean() {
+		return InstructorOverallMean;
+	}
+	
+	// set the Response Rate
+	public void setResponseRate(String ResponseRate) {
+		this.ResponseRate = ResponseRate;
+	}
+	
+	// get the Response Rate
+	public String getResponseRate() {
+		return ResponseRate;
 	}
 	
 

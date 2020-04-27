@@ -21,6 +21,7 @@ import javafx.scene.paint.Color;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 public class Controller {
 
     @FXML
@@ -73,6 +74,8 @@ public class Controller {
     
     private Scraper scraper = new Scraper();
     
+    private Scraper scraperSFQ = new Scraper();
+    
     @FXML
     void allSubjectSearch() {
     	
@@ -82,16 +85,33 @@ public class Controller {
     void findInstructorSfq() {
     	buttonInstructorSfq.setDisable(true);
     }
+    
+    // Should be true
+	private boolean DISABLED = true;
 
     @FXML
     void findSfqEnrollCourse() {
-
+    	// AllsubjectSearch condition to be implemented
+    	buttonSfqEnrollCourse.setDisable(DISABLED);
+    	if (DISABLED)
+    		return;
+    	List<Course> v = scraperSFQ.scrapeSFQ(textfieldSfqUrl.getText());
+    	for (Course c: v) {
+    		String newline = c.getTitle() + " Course Overall Mean: " + c.getCourseOverallMean() +
+    				" Instructor Overall Mean: " + c.getInstructorOverallMean() + 
+    				" Response Rate: " + c.getResponseRate();
+    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+    	}    	
     }
 
     @FXML
     void search() {
+    	// AllsubjectSearch condition to be implemented
+    	DISABLED = false;
+    	buttonSfqEnrollCourse.setDisable(DISABLED);
+    	
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
-    	List<String> instructors = new ArrayList<String>();
+    	PriorityQueue<String> instructors = new PriorityQueue<String>();
     	
     	// Add all instructors to the list
     	for (Course c : v) {
@@ -133,7 +153,7 @@ public class Controller {
     			Section x = c.getSection(i);
     			newline += "Slot " + i + ":" + t + " Section " + x.toString() + "\n";
     			
-    			// Add instructor
+    			// Modify instructors
     			LocalTime time = LocalTime.of(15, 10);
     			if(t.getDay() == 1 && t.getStart().isBefore(time) && t.getEnd().isAfter(time)) {
     				// remove from the instructor list
@@ -148,8 +168,8 @@ public class Controller {
     	
     	// Print instructors on the console
     	String line = "Instructors free: ";
-    	for(String s : instructors) {
-    		line += "\"" + s + "\", ";
+    	while(!instructors.isEmpty()) {
+    		line += "\"" + instructors.remove() + "\", ";
     	}
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + line);
     	
