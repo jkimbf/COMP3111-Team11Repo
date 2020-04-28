@@ -59,6 +59,35 @@ public class Course {
 		return null;
 	}
 	
+	/**
+	 * @param section - section ID
+	 * @return number of slots for the input section ID
+	 */
+	public int getNumSlotsForSec(String section) {
+		int counter = 0;
+		for(int i = 0; i < numSections; i++)
+			if(sections[i].getCode().equals(section))
+				counter++;
+		return counter;
+	}
+	
+	public void getSectionIndex(String section, int[] output) {
+		int index = 0;
+		for(int i = 0; i < numSections; i++) {
+			if(sections[i].getCode().equals(section)) {
+				output[index++] = i;
+			}
+		}
+	}
+	
+	public void getDaysOfSection(String section, int[] output) {
+		int index = 0;
+		for(int i = 0; i < numSections; i++) {
+			if(sections[i].getCode().equals(section)) {
+				output[index++] = slots[i].getDay();
+			}
+		}
+	}
 
 	/**
 	 * @return the title
