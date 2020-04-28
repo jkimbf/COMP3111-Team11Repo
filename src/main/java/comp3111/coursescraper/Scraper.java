@@ -91,10 +91,13 @@ public class Scraper {
 	private void addSlot(HtmlElement e, Course c, boolean secondRow) {
 		String times[] =  e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
 		String venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
-		String IDCode[] = e.getChildNodes().get(secondRow ? 0 : 1).asText().split(" ");
-		String instructors[] = e.getChildNodes().get(secondRow ? 0 : 5).asText().split("\n");
-		if (times[0].equals("TBA"))
+		String instructors[] = e.getChildNodes().get(secondRow ? 2 : 5).asText().split("\n");
+		String IDCode[] = e.getChildNodes().get(1).asText().split(" ");
+		
+		if (times[0].equals("TBA")) {
+			c.addOneToActualNumSec();
 			return;
+		}
 		for (int j = 0; j < times[0].length(); j+=2) {
 			String code = times[0].substring(j , j + 2);
 			if (Slot.DAYS_MAP.get(code) == null)
@@ -130,11 +133,7 @@ public class Scraper {
 		try {			
 
 			HtmlPage page = client.getPage(baseurl + "/" + term + "/subject/" + sub);
-			
-			
 			List<?> items = (List<?>) page.getByXPath("//div[@class='course']");
-
-		
 			Vector<Course> result = new Vector<Course>();
 
 			for (int i = 0; i < items.size(); i++) {
@@ -161,6 +160,9 @@ public class Scraper {
 					e = (HtmlElement)e.getNextSibling();
 					if (e != null && !e.getAttribute("class").contains("newsect")) {
 						addSlot(e, c, true);
+						c.getSection(c.getNumSlots()-1).setCode(c.getSection(c.getNumSlots()-2).getCode());
+						c.getSection(c.getNumSlots()-1).setID(c.getSection(c.getNumSlots()-2).getID());
+						c.subtractOneToActualNumSec();
 					}	
 				}
 				
@@ -174,7 +176,7 @@ public class Scraper {
 		return null;
 	}
 	
-	
+	// For scraping SFQ data only
 	public List<Course> scrapeSFQ(String baseurl) {
 
 		try {			

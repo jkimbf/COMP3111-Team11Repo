@@ -4,7 +4,7 @@ package comp3111.coursescraper;
 
 public class Course {
 	private static final int DEFAULT_MAX_SLOT = 20;
-	private static final int DEFAULT_MAX_SECTION = 20;
+	private static final int DEFAULT_MAX_SECTION = 40;
 	
 	private String title ; 
 	private String description ;
@@ -149,6 +149,16 @@ public class Course {
 	// get the Response Rate
 	public String getResponseRate() {
 		return ResponseRate;
+	}
+	
+	// Add one to the actual number of sections
+	public void addOneToActualNumSec() {
+		++actualNumSec;
+	}
+	
+	// Subtract one to the actual number of sections
+	public void subtractOneToActualNumSec() {
+		--actualNumSec;
 	}
 	
 

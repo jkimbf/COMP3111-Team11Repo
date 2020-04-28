@@ -106,6 +106,7 @@ public class Controller {
 
     @FXML
     void search() {
+    	// For diabling SFQ button until Search button is clicked
     	// AllsubjectSearch condition to be implemented
     	DISABLED = false;
     	buttonSfqEnrollCourse.setDisable(DISABLED);
@@ -128,26 +129,9 @@ public class Controller {
     			}
     		}
     	}
-    	
-    	
-    	// Calculates total number of courses
-    	int numCourses = 0;
-    	for (Course c : v) {
-    		for(int i = 0; i < c.getNumSlots(); ++i) {
-    			if (c.getSection(i).getCode().charAt(0) == 'L' ||
-    					c.getSection(i).getCode().charAt(0) == 'T' ||
-    					c.getSection(i).getCode().substring(0,1) == "LA") {
-    				++numCourses;
-    				break;
-    			}
-    		}
-    	}
-    	String num = "Number of courses: " + Integer.toString(numCourses) + "\n";
-    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + num);
-    	
+    	    	
     	for (Course c : v) {
     		String newline = c.getTitle() + "\n";
-    		newline += "Number of sections: " + c.getNumSections() + "\n";
     		for (int i = 0; i < c.getNumSlots(); i++) {
     			Slot t = c.getSlot(i);
     			Section x = c.getSection(i);
@@ -166,12 +150,38 @@ public class Controller {
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
     	
+    	// Calculates total number of courses and sections
+    	int numCourses = 0;
+    	int numSections = 0;
+    	for (Course c : v) {
+    		numSections += c.getNumSections();
+    		for(int i = 0; i < c.getNumSlots(); ++i) {
+    			if (c.getSection(i).getCode().charAt(0) == 'L' ||
+    					c.getSection(i).getCode().charAt(0) == 'T' ||
+    					c.getSection(i).getCode().substring(0,1) == "LA") {
+    				++numCourses;
+    				break;
+    			}
+    		}
+    	}
+    	
+    	// Print total number of sections
+    	String secNum = "Number of sections: " + Integer.toString(numSections) + "\n";
+    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + secNum);
+    	
+    	// Print total number of courses
+    	String num = "Number of courses: " + Integer.toString(numCourses) + "\n";
+    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + num);
+    	
     	// Print instructors on the console
     	String line = "Instructors free: ";
     	while(!instructors.isEmpty()) {
     		line += "\"" + instructors.remove() + "\", ";
     	}
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + line);
+    	
+    	
+    	
     	
     	//Add a random block on Saturday
     	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
