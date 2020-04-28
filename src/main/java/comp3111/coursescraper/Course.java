@@ -4,7 +4,7 @@ package comp3111.coursescraper;
 
 public class Course {
 	private static final int DEFAULT_MAX_SLOT = 20;
-	private static final int DEFAULT_MAX_SECTION = 20;
+	private static final int DEFAULT_MAX_SECTION = 40;
 	
 	private String title ; 
 	private String description ;
@@ -14,6 +14,13 @@ public class Course {
 	private Section[] sections;
 	private int numSections;
 	private int actualNumSec;
+	
+	// SFQ variables
+	private String CourseOverallMean;
+	private String InstructorOverallMean;
+	private String Enrolment;
+	private String ResponseRate;
+	
 	
 	public Course() {
 		slots = new Slot[DEFAULT_MAX_SLOT];
@@ -112,6 +119,46 @@ public class Course {
 	// get the actual number of Sections
 	public int getNumSections() {
 		return actualNumSec;
+	}
+	
+	// set the Course Overall Mean
+	public void setCourseOverallMean(String CourseOverallMean) {
+		this.CourseOverallMean = CourseOverallMean;
+	}
+	
+	// get the Course Overall Mean
+	public String getCourseOverallMean() {
+		return CourseOverallMean;
+	}
+	
+	// set the Instructor Overall Mean
+	public void setInstructorOverallMean(String InstructorOverallMean) {
+		this.InstructorOverallMean = InstructorOverallMean;
+	}
+	
+	// get the Instructor Overall Mean
+	public String getInstructorOverallMean() {
+		return InstructorOverallMean;
+	}
+	
+	// set the Response Rate
+	public void setResponseRate(String ResponseRate) {
+		this.ResponseRate = ResponseRate;
+	}
+	
+	// get the Response Rate
+	public String getResponseRate() {
+		return ResponseRate;
+	}
+	
+	// Add one to the actual number of sections
+	public void addOneToActualNumSec() {
+		++actualNumSec;
+	}
+	
+	// Subtract one to the actual number of sections
+	public void subtractOneToActualNumSec() {
+		--actualNumSec;
 	}
 	
 

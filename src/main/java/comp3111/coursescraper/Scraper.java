@@ -91,10 +91,13 @@ public class Scraper {
 	private void addSlot(HtmlElement e, Course c, boolean secondRow) {
 		String times[] =  e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
 		String venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
-		String IDCode[] = e.getChildNodes().get(secondRow ? 0 : 1).asText().split(" ");
-		String instructors[] = e.getChildNodes().get(secondRow ? 0 : 5).asText().split("\n");
-		if (times[0].equals("TBA"))
+		String instructors[] = e.getChildNodes().get(secondRow ? 2 : 5).asText().split("\n");
+		String IDCode[] = e.getChildNodes().get(1).asText().split(" ");
+		
+		if (times[0].equals("TBA")) {
+			c.addOneToActualNumSec();
 			return;
+		}
 		for (int j = 0; j < times[0].length(); j+=2) {
 			String code = times[0].substring(j , j + 2);
 			if (Slot.DAYS_MAP.get(code) == null)
@@ -130,11 +133,7 @@ public class Scraper {
 		try {			
 
 			HtmlPage page = client.getPage(baseurl + "/" + term + "/subject/" + sub);
-			
-			
 			List<?> items = (List<?>) page.getByXPath("//div[@class='course']");
-
-		
 			Vector<Course> result = new Vector<Course>();
 
 			for (int i = 0; i < items.size(); i++) {
@@ -161,6 +160,9 @@ public class Scraper {
 					e = (HtmlElement)e.getNextSibling();
 					if (e != null && !e.getAttribute("class").contains("newsect")) {
 						addSlot(e, c, true);
+						c.getSection(c.getNumSlots()-1).setCode(c.getSection(c.getNumSlots()-2).getCode());
+						c.getSection(c.getNumSlots()-1).setID(c.getSection(c.getNumSlots()-2).getID());
+						c.subtractOneToActualNumSec();
 					}	
 				}
 				
@@ -173,5 +175,50 @@ public class Scraper {
 		}
 		return null;
 	}
+	
+	// For scraping SFQ data only
+	public List<Course> scrapeSFQ(String baseurl) {
 
+		try {			
+
+			HtmlPage page = client.getPage(baseurl);			
+			List<?> items = (List<?>) page.getByXPath(".//table");			
+			Vector<Course> result = new Vector<Course>();
+			
+			// 2 is the index for the first table
+			for (int i = 2; i < items.size()-1; i++) {				
+				HtmlElement table = (HtmlElement) items.get(i);
+				List<?> lines = (List<?>) table.getByXPath(".//tr");
+				
+				// lines(0) is garbage
+				for (int j = 1; j < lines.size(); ++j) {
+					HtmlElement line = (HtmlElement) lines.get(j);
+					List<?> cells = (List<?>) line.getByXPath(".//td");
+					
+					// Initialize the required variables
+					HtmlElement title = (HtmlElement) cells.get(0);
+					HtmlElement COM = (HtmlElement) cells.get(1);
+					HtmlElement IOM = (HtmlElement) cells.get(2);
+					HtmlElement RR = (HtmlElement) cells.get(4);
+					
+					// Get rid of Blank lines,Course Overall and Department Overall
+					if (title.asText().length() < 2 ||
+							title.asText().length() > 11)
+						continue;
+					
+					Course c = new Course();
+					c.setTitle(title.asText());
+					c.setCourseOverallMean(COM.asText().substring(0,4));
+					c.setInstructorOverallMean(IOM.asText().substring(0,4));
+					c.setResponseRate(RR.asText().substring(0,5));
+					result.add(c);
+				}
+			}
+			client.close();
+			return result;
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
 }
