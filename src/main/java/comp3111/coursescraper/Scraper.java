@@ -145,14 +145,19 @@ public class Scraper {
 				
 				List<?> popupdetailslist = (List<?>) htmlItem.getByXPath(".//div[@class='popupdetail']/table/tbody/tr");
 				HtmlElement exclusion = null;
+				HtmlElement cc4Y = null;
 				for ( HtmlElement e : (List<HtmlElement>)popupdetailslist) {
 					HtmlElement t = (HtmlElement) e.getFirstByXPath(".//th");
 					HtmlElement d = (HtmlElement) e.getFirstByXPath(".//td");
 					if (t.asText().equals("EXCLUSION")) {
 						exclusion = d;
 					}
+					if (t.asText().equals("ATTRIBUTES")) {
+						cc4Y = d;
+					}
 				}
 				c.setExclusion((exclusion == null ? "null" : exclusion.asText()));
+				c.setCC4Y((cc4Y == null ? "null" : cc4Y.asText()));
 				
 				List<?> sections = (List<?>) htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
 				for ( HtmlElement e: (List<HtmlElement>)sections) {

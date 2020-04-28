@@ -146,6 +146,121 @@ public class Controller {
     	textAreaConsole.setText("");
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
     	
+    	// Days
+    	if(checkMon.isSelected() || checkTue.isSelected() || checkWed.isSelected() 
+    			|| checkThu.isSelected() || checkFri.isSelected() || checkSat.isSelected()) {
+    		int intMon = (checkMon.isSelected())? 1: 0;
+    		int intTue = (checkTue.isSelected())? 1: 0;
+    		int intWed = (checkWed.isSelected())? 1: 0;
+    		int intThu = (checkThu.isSelected())? 1: 0;
+    		int intFri = (checkFri.isSelected())? 1: 0;
+    		int intSat = (checkSat.isSelected())? 1: 0;
+    		int counter = intMon + intTue + intWed + intThu + intFri + intSat;
+    		// if one of the Days buttons is clicked
+    		if(counter == 1) {
+    			int buttonNum = -1;
+    			if(intMon == 1) buttonNum = 0;
+    			if(intTue == 1) buttonNum = 1;
+    			if(intWed == 1) buttonNum = 2;
+    			if(intThu == 1) buttonNum = 3;
+    			if(intFri == 1) buttonNum = 4;
+    			if(intSat == 1) buttonNum = 5;
+    			
+    			for(int i = 0; i < v.size(); i++) {
+	    			Course temp = new Course();
+	    			temp.setTitle(v.get(i).getTitle());
+	    			temp.setDescription(v.get(i).getDescription());
+	    			temp.setExclusion(v.get(i).getExclusion());
+	    			temp.setCC4Y(v.get(i).getCC4Y());
+	    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+	    				if(v.get(i).getSlot(j).getDay() == buttonNum) {
+	    					temp.addSlot(v.get(i).getSlot(j));
+	    					temp.addSection(v.get(i).getSection(j));
+	    				}
+	    			}
+	    			v.remove(i);
+	    			v.add(i, temp);
+	    		}
+    		}
+    		// A section may have zero, one, two, or three slots
+    		else if(counter >= 2 && counter <= 3) {
+    			int[] buttonNums = new int[counter];
+    			for(int i = 0; i < counter; i++)
+    			{
+	    			if(intMon == 1)	{ buttonNums[i] = 0; intMon-=1; continue; }
+	        		if(intTue == 1) { buttonNums[i] = 1; intTue-=1; continue; }
+	        		if(intWed == 1) { buttonNums[i] = 2; intWed-=1; continue; }
+	        		if(intThu == 1) { buttonNums[i] = 3; intThu-=1; continue; }
+	        		if(intFri == 1) { buttonNums[i] = 4; intFri-=1; continue; }
+	        		if(intSat == 1) { buttonNums[i] = 5; intSat-=1; continue; }
+    			}
+    			
+    			String prevCode = "";
+    			for(int i = 0; i < v.size(); i++) {
+					Course temp = new Course();
+	    			temp.setTitle(v.get(i).getTitle());
+	    			temp.setDescription(v.get(i).getDescription());
+	    			temp.setExclusion(v.get(i).getExclusion());
+	    			temp.setCC4Y(v.get(i).getCC4Y());
+	    			
+	    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+	    				Section tempSection = v.get(i).getSection(j);
+	    				if(prevCode.equals(tempSection.getCode()))
+	    					continue;
+	    				//textAreaConsole.setText(textAreaConsole.getText() + "\n" 
+						//		+ tempSection.getCode());
+	    				int numSlots = v.get(i).getNumSlotsForSec(tempSection.getCode());
+	    				int[] indices = new int[numSlots];
+	    				v.get(i).getDaysOfSection(tempSection.getCode(), indices);
+	    				
+	    				int[] outputIndices = new int[counter];
+	    				int index = 0;
+	    				boolean test = true;
+	    				for(int k = 0; k < numSlots; k++) {
+	    					boolean tempTest = false;
+	    					for(int p = 0; p < counter; p++) {
+	    						if(indices[k] == buttonNums[p]) {
+	    							tempTest = true;
+	    							outputIndices[index++] = j+k;
+	    						}
+	    					}
+	    					if(!tempTest)
+	    						test = false;
+	    				}
+	    				if(numSlots < counter)
+	    					test = false;
+	    				
+	    				if(test) {
+	    					for(int k = 0; k < counter; k++) {
+	    						temp.addSlot(v.get(i).getSlot(outputIndices[k]));
+		    					temp.addSection(v.get(i).getSection(outputIndices[k]));
+	    					}
+	    				}
+	    				prevCode = tempSection.getCode();
+	    			}
+	    			
+	    			v.remove(i);
+	    			v.add(i, temp);
+				}	
+    		}
+    		// More than or equal to 4 buttons will always give no result
+    		else {
+    			for(int i = 0; i < v.size(); i++) {
+        			Course temp = new Course();
+        			temp.setTitle(v.get(i).getTitle());
+        			temp.setDescription(v.get(i).getDescription());
+        			temp.setExclusion(v.get(i).getExclusion());
+        			temp.setCC4Y(v.get(i).getCC4Y());
+        			
+        			// deleting all slots
+        			
+        			v.remove(i);
+        			v.add(i, temp);
+        		}
+    		}
+    	}
+    	
+    	
     	// AM & PM Check boxes
     	if(checkAM.isSelected() && checkPM.isSelected()) {
     		for(int i = 0; i < v.size(); i++) {
@@ -153,6 +268,7 @@ public class Controller {
     			temp.setTitle(v.get(i).getTitle());
     			temp.setDescription(v.get(i).getDescription());
     			temp.setExclusion(v.get(i).getExclusion());
+    			temp.setCC4Y(v.get(i).getCC4Y());
     			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
     				int slotsNum = v.get(i).getNumSlotsForSec(v.get(i).getSection(j).getCode());
     				int[] indices = new int[slotsNum];
@@ -189,6 +305,7 @@ public class Controller {
 	    			temp.setTitle(v.get(i).getTitle());
 	    			temp.setDescription(v.get(i).getDescription());
 	    			temp.setExclusion(v.get(i).getExclusion());
+	    			temp.setCC4Y(v.get(i).getCC4Y());
 	    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
 	    				if((v.get(i).getSlot(j).getStartHour() >= 0 && v.get(i).getSlot(j).getStartHour() < 12) || 
 	    						(v.get(i).getSlot(j).getEndHour() >= 0 && v.get(i).getSlot(j).getEndHour() < 12)) {
@@ -207,6 +324,7 @@ public class Controller {
 	    			temp.setTitle(v.get(i).getTitle());
 	    			temp.setDescription(v.get(i).getDescription());
 	    			temp.setExclusion(v.get(i).getExclusion());
+	    			temp.setCC4Y(v.get(i).getCC4Y());
 	    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
 	    				if((v.get(i).getSlot(j).getStartHour() >= 12 && v.get(i).getSlot(j).getStartHour() < 24) || 
 	    						(v.get(i).getSlot(j).getEndHour() >= 12 && v.get(i).getSlot(j).getEndHour() < 24)) {
@@ -221,125 +339,35 @@ public class Controller {
     	}
     	
     	
-    	// Days
-    	if(checkMon.isSelected() || checkTue.isSelected() || checkWed.isSelected() 
-    			|| checkThu.isSelected() || checkFri.isSelected() || checkSat.isSelected()) {
-    		int intMon = (checkMon.isSelected())? 1: 0;
-    		int intTue = (checkTue.isSelected())? 1: 0;
-    		int intWed = (checkWed.isSelected())? 1: 0;
-    		int intThu = (checkThu.isSelected())? 1: 0;
-    		int intFri = (checkFri.isSelected())? 1: 0;
-    		int intSat = (checkSat.isSelected())? 1: 0;
-    		int counter = intMon + intTue + intWed + intThu + intFri + intSat;
-    		// if one of the Days buttons is clicked
-    		if(counter == 1) {
-    			int buttonNum = -1;
-    			if(intMon == 1) buttonNum = 0;
-    			if(intTue == 1) buttonNum = 1;
-    			if(intWed == 1) buttonNum = 2;
-    			if(intThu == 1) buttonNum = 3;
-    			if(intFri == 1) buttonNum = 4;
-    			if(intSat == 1) buttonNum = 5;
+    	// Common Core
+    	if(checkCC.isSelected()) {
+    		for(int i = 0; i < v.size(); i++) {
+    			Course temp = new Course();
+    			temp.setTitle(v.get(i).getTitle());
+    			temp.setDescription(v.get(i).getDescription());
+    			temp.setExclusion(v.get(i).getExclusion());
+    			temp.setCC4Y(v.get(i).getCC4Y());
     			
-    			for(int i = 0; i < v.size(); i++) {
-	    			Course temp = new Course();
-	    			temp.setTitle(v.get(i).getTitle());
-	    			temp.setDescription(v.get(i).getDescription());
-	    			temp.setExclusion(v.get(i).getExclusion());
-	    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
-	    				if(v.get(i).getSlot(j).getDay() == buttonNum) {
-	    					temp.addSlot(v.get(i).getSlot(j));
-	    					temp.addSection(v.get(i).getSection(j));
-	    				}
-	    			}
-	    			v.remove(i);
-	    			v.add(i, temp);
-	    		}
-    		}
-    		// A section may have zero, one, two, or three slots
-    		else if(counter >= 2 && counter <= 3) {
-    			int[] buttonNums = new int[counter];
-    			for(int i = 0; i < counter; i++)
-    			{
-	    			if(intMon == 1)	{ buttonNums[i] = 0; intMon-=1; continue; }
-	        		if(intTue == 1) { buttonNums[i] = 1; intTue-=1; continue; }
-	        		if(intWed == 1) { buttonNums[i] = 2; intWed-=1; continue; }
-	        		if(intThu == 1) { buttonNums[i] = 3; intThu-=1; continue; }
-	        		if(intFri == 1) { buttonNums[i] = 4; intFri-=1; continue; }
-	        		if(intSat == 1) { buttonNums[i] = 5; intSat-=1; continue; }
+    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+    				if(v.get(i).getCC4Y().contains("4Y")) {
+    					temp.addSlot(v.get(i).getSlot(j));
+    					temp.addSection(v.get(i).getSection(j));
+    				}
     			}
-    			
-    			String prevCode = "";
-    			for(int i = 0; i < v.size(); i++) {
-					Course temp = new Course();
-	    			temp.setTitle(v.get(i).getTitle());
-	    			temp.setDescription(v.get(i).getDescription());
-	    			temp.setExclusion(v.get(i).getExclusion());
-	    			
-	    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
-	    				Section tempSection = v.get(i).getSection(j);
-	    				if(prevCode.equals(tempSection.getCode()))
-	    					continue;
-	    				//textAreaConsole.setText(textAreaConsole.getText() + "\n" 
-						//		+ tempSection.getCode());
-	    				int numSlots = v.get(i).getNumSlotsForSec(tempSection.getCode());
-	    				int[] indices = new int[numSlots];
-	    				v.get(i).getDaysOfSection(tempSection.getCode(), indices);
-	    				
-	    				int[] outputIndices = new int[counter];
-	    				int index = 0;
-	    				boolean test = true;
-	    				for(int k = 0; k < numSlots; k++) {
-	    					boolean tempTest = false;
-	    					for(int p = 0; p < counter; p++) {
-	    						if(indices[k] == buttonNums[p]) {
-	    							tempTest = true;
-	    							outputIndices[index++] = j+k;
-	    						}
-	    					}
-	    					if(!tempTest)
-	    						test = false;
-	    				}
-	    				if(numSlots < counter)
-	    					test = false;
-	    				
-	    				if(test) {
-	    					for(int k = 0; k < counter; k++) {
-	    						temp.addSlot(v.get(i).getSlot(outputIndices[k]));
-		    					temp.addSection(v.get(i).getSection(outputIndices[k]));
-	    					}
-	    				}
-	    				
-	    				prevCode = tempSection.getCode();
-	    			}
-	    			
-	    			v.remove(i);
-	    			v.add(i, temp);
-				}	
-    		}
-    		// More than or equal to 4 buttons will always give no result
-    		else {
-    			for(int i = 0; i < v.size(); i++) {
-        			Course temp = new Course();
-        			temp.setTitle(v.get(i).getTitle());
-        			temp.setDescription(v.get(i).getDescription());
-        			temp.setExclusion(v.get(i).getExclusion());
-        			
-        			// deleting all slots
-        			
-        			v.remove(i);
-        			v.add(i, temp);
-        		}
+    			v.remove(i);
+    			v.add(i, temp);
     		}
     	}
     	
-    	// Exclusion
+    	
+    	// No Exclusion
     	if(checkNoEx.isSelected()) {
     		for(int i = 0; i < v.size(); i++) {
     			Course temp = new Course();
     			temp.setTitle(v.get(i).getTitle());
     			temp.setDescription(v.get(i).getDescription());
     			temp.setExclusion(v.get(i).getExclusion());
+    			temp.setCC4Y(v.get(i).getCC4Y());
     			
     			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
     				if(v.get(i).getExclusion() == "null") {
@@ -352,20 +380,28 @@ public class Controller {
     		}
     	}
     	
-    	// Calculates total number of courses
-    	int numCourses = 0;
-    	for (Course c : v) {
-    		for(int i = 0; i < c.getNumSlots(); ++i) {
-    			if (c.getSection(i).getCode().charAt(0) == 'L' ||
-    					c.getSection(i).getCode().charAt(0) == 'T' ||
-    					c.getSection(i).getCode().substring(0,1) == "LA") {
-    				++numCourses;
-    				break;
+    	
+    	// With Labs or Tutorial
+    	if(checkLAT.isSelected()) {
+    		for(int i = 0; i < v.size(); i++) {
+    			Course temp = new Course();
+    			temp.setTitle(v.get(i).getTitle());
+    			temp.setDescription(v.get(i).getDescription());
+    			temp.setExclusion(v.get(i).getExclusion());
+    			temp.setCC4Y(v.get(i).getCC4Y());
+    			
+    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+    				if(v.get(i).getSection(j).getCode().contains("LA")
+    						|| v.get(i).getSection(j).getCode().charAt(0) == 'T') {
+    					temp.addSlot(v.get(i).getSlot(j));
+    					temp.addSection(v.get(i).getSection(j));
+    				}
     			}
+    			v.remove(i);
+    			v.add(i, temp);
     		}
     	}
-    	String num = "Number of courses: " + Integer.toString(numCourses) + "\n";
-    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + num);
+    	
     	
     	for (Course c : v) {
     		String newline = "";
@@ -378,11 +414,25 @@ public class Controller {
     		
     		//check whether slots exist after filtering
     		if(c.getNumSlots() != 0) {
-    			String newTitle = c.getTitle() + "\n" + "Number of sections: " + c.getNumSections() + "\n";
+    			String newTitle = c.getTitle() + "\n"; // + "Number of sections: " + c.getNumSections() + "\n";
     			newTitle += newline;
     			textAreaConsole.setText(textAreaConsole.getText() + "\n" + newTitle);
     		}
     	}
+    	
+    	// Calculates total number of courses and sections
+    	int numSections = 0;
+    	for (Course c : v) {
+    		numSections += c.getNumSections();
+    	}
+    	
+    	// Print total number of sections
+    	String secNum = "Number of sections: " + Integer.toString(numSections) + "\n";
+    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + secNum);
+    	
+    	// Print total number of courses
+    	String num = "Number of courses: " + Integer.toString(v.size()) + "\n";
+    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + num);
     }
     
     @FXML
@@ -415,6 +465,7 @@ public class Controller {
 
     @FXML
     void search() {
+    	textAreaConsole.setText("");
     	// For diabling SFQ button until Search button is clicked
     	// AllsubjectSearch condition to be implemented
     	DISABLED = false;
