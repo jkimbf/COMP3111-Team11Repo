@@ -7,8 +7,9 @@ public class Course {
 	private static final int DEFAULT_MAX_SECTION = 40;
 	
 	private String title ; 
-	private String description ;
+	private String description;
 	private String exclusion;
+	private String cc4Y;
 	private Slot [] slots;
 	private int numSlots;
 	private Section[] sections;
@@ -115,6 +116,20 @@ public class Course {
 	 */
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	/**
+	 * @return the exclusion
+	 */
+	public String getCC4Y() {
+		return cc4Y;
+	}
+
+	/**
+	 * @param exclusion the exclusion to set
+	 */
+	public void setCC4Y(String ccInfo) {
+		this.cc4Y = ccInfo;
 	}
 
 	/**
