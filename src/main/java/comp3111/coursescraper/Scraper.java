@@ -110,7 +110,7 @@ public class Scraper {
 			s.setInstructor(instructors.length);
 			for(String inst : instructors) {
 				// Delete unexpected "\n" before addition
-				if(instructors.length > 0 && inst != instructors[instructors.length-1]) {
+				if(inst.contains("\r") || inst.contains("\n") || inst.contains("\r\n")) {
 					s.addInstructor(inst.substring(0,inst.length()-1));
 				}
 				else {
