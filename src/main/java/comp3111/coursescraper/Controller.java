@@ -3,6 +3,8 @@ package comp3111.coursescraper;
 import java.awt.event.ActionEvent;
 import java.time.LocalTime;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -10,7 +12,10 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -112,6 +117,48 @@ public class Controller {
     
     @FXML
     private CheckBox checkLAT;
+    
+    @FXML
+    private TableView<courseData> courseTable;
+    
+    @FXML
+    private TableColumn<courseData, String> codeCol;
+    
+    @FXML
+    private TableColumn<courseData, String> sectionCol;
+    
+    @FXML
+    private TableColumn<courseData, String> nameCol;
+    
+    @FXML
+    private TableColumn<courseData, String> instructorCol;
+    
+    @FXML
+    private TableColumn<courseData, CheckBox> enrollCol;
+    
+    @FXML
+    private ObservableList<courseData> list = FXCollections.observableArrayList();
+    
+    /*public List<courseData> courseDataSet = null;
+    
+    @FXML
+    public void initializeCourseSet() {
+    	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	int index = 0;
+    	for(int i = 0; i < v.size(); i++) {
+    		String[] courseInfo = v.get(i).getTitle().split("-");
+    		String courseCode = courseInfo[0];
+    		String name = courseInfo[1];
+    		
+    		for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+    			String section = v.get(i).getSection(j).getCode();
+    			String instructor = "Steve Kim";
+    			CheckBox ch = new CheckBox();
+    			courseDataSet.add(index++, new courseData(courseCode, section, name, instructor, ch));
+    		}
+    		
+    	}
+    }*/
     
     @FXML
     void selectAll() {
@@ -390,12 +437,19 @@ public class Controller {
     			temp.setExclusion(v.get(i).getExclusion());
     			temp.setCC4Y(v.get(i).getCC4Y());
     			
+    			boolean containsLAT = false;
     			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
     				if(v.get(i).getSection(j).getCode().contains("LA")
     						|| v.get(i).getSection(j).getCode().charAt(0) == 'T') {
-    					temp.addSlot(v.get(i).getSlot(j));
-    					temp.addSection(v.get(i).getSection(j));
+    					containsLAT = true;
     				}
+    			}
+    			
+    			if(containsLAT) {
+	    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+	    				temp.addSlot(v.get(i).getSlot(j));
+						temp.addSection(v.get(i).getSection(j));
+	    			}
     			}
     			v.remove(i);
     			v.add(i, temp);
@@ -433,6 +487,39 @@ public class Controller {
     	// Print total number of courses
     	String num = "Number of courses: " + Integer.toString(v.size()) + "\n";
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + num);
+    	
+    	listFilteredCourses(v);
+    }
+    
+    public void listFilteredCourses(List<Course> v) {
+    	list.clear();
+    	for(int i = 0; i < v.size(); i++) {
+    		String[] courseInfo = v.get(i).getTitle().split("-", 2);
+    		String courseCode = courseInfo[0];
+    		String name = courseInfo[1].substring(0, courseInfo[1].indexOf('(')-1);
+    		
+    		for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+    			String section = v.get(i).getSection(j).getCode();
+    			String instructor = "";
+    			int k = 0;
+    			while(k < v.get(i).getSlot(j).getInstNum()-1)
+    				instructor += (v.get(i).getSlot(j).getInstructor(k++)+" / ");
+    			instructor += v.get(i).getSlot(j).getInstructor(k);
+    			CheckBox ch = new CheckBox();
+    			list.add(new courseData(courseCode, section, name, instructor, ch));
+    		}
+    		
+    	}
+    	/*for(int i = 0; i < courseDataSet.size(); i++) {
+    		list.add(courseDataSet.get(i));
+    	}*/
+    	
+    	courseTable.setItems(list);
+    	codeCol.setCellValueFactory(new PropertyValueFactory<courseData,String>("courseCode"));
+    	sectionCol.setCellValueFactory(new PropertyValueFactory<courseData,String>("section"));
+    	nameCol.setCellValueFactory(new PropertyValueFactory<courseData,String>("name"));
+    	instructorCol.setCellValueFactory(new PropertyValueFactory<courseData,String>("instructor"));
+    	enrollCol.setCellValueFactory(new PropertyValueFactory<courseData,CheckBox>("enroll"));
     }
     
     @FXML
