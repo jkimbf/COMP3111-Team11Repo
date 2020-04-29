@@ -119,14 +119,14 @@ public class Course {
 	}
 	
 	/**
-	 * @return the exclusion
+	 * @return the Common Core Information
 	 */
 	public String getCC4Y() {
 		return cc4Y;
 	}
 
 	/**
-	 * @param exclusion the exclusion to set
+	 * @param ccInfo: the Common Core information to set
 	 */
 	public void setCC4Y(String ccInfo) {
 		this.cc4Y = ccInfo;
@@ -140,7 +140,7 @@ public class Course {
 	}
 
 	/**
-	 * @param exclusion the exclusion to set
+	 * @param exclusion: the exclusion to set
 	 */
 	public void setExclusion(String exclusion) {
 		this.exclusion = exclusion;
