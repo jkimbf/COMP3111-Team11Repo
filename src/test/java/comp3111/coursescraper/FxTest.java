@@ -59,7 +59,7 @@ public class FxTest extends ApplicationTest {
 		clickOn("#tabFilter");
 		clickOn("#selectAllButton");
 		Button b = (Button)s.lookup("#selectAllButton");
-		sleep(1000);
+		sleep(5000);
 		assertEquals(b.getText(), "De-select All");
 	}
 }

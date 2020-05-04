@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -139,26 +140,23 @@ public class Controller {
     @FXML
     private ObservableList<courseData> list = FXCollections.observableArrayList();
     
-    /*public List<courseData> courseDataSet = null;
-    
     @FXML
-    public void initializeCourseSet() {
-    	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
-    	int index = 0;
-    	for(int i = 0; i < v.size(); i++) {
-    		String[] courseInfo = v.get(i).getTitle().split("-");
-    		String courseCode = courseInfo[0];
-    		String name = courseInfo[1];
-    		
-    		for(int j = 0; j < v.get(i).getNumSlots(); j++) {
-    			String section = v.get(i).getSection(j).getCode();
-    			String instructor = "Steve Kim";
-    			CheckBox ch = new CheckBox();
-    			courseDataSet.add(index++, new courseData(courseCode, section, name, instructor, ch));
-    		}
-    		
-    	}
-    }*/
+    private ObservableList<courseData> listForPrint = FXCollections.observableArrayList();
+    
+    private String prevURL;
+    
+    private String prevTerm;
+    
+    private String prevSubject;
+    
+    //public List<courseData> courseDataSet;
+    @FXML
+    public void initialize() {
+    	initializeCourseSet();
+    	prevURL = textfieldURL.getText();
+	    prevTerm = textfieldTerm.getText();
+	    prevSubject = textfieldSubject.getText();
+    }
     
     @FXML
     void selectAll() {
@@ -190,6 +188,12 @@ public class Controller {
     // Need to be changed
     @FXML
     void filterSearch() {
+    	if(!prevURL.equals(textfieldURL.getText()) || !prevTerm.equals(textfieldTerm.getText()) || !prevSubject.equals(textfieldSubject.getText())) {
+    		initializeCourseSet();
+    		prevURL = textfieldURL.getText();
+    	    prevTerm = textfieldTerm.getText();
+    	    prevSubject = textfieldSubject.getText();
+    	}
     	textAreaConsole.setText("");
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
     	
@@ -474,47 +478,115 @@ public class Controller {
     		}
     	}
     	
-    	// Calculates total number of courses and sections
-    	int numSections = 0;
-    	for (Course c : v) {
-    		numSections += c.getNumSections();
-    	}
-    	
-    	// Print total number of sections
-    	String secNum = "Number of sections: " + Integer.toString(numSections) + "\n";
-    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + secNum);
-    	
-    	// Print total number of courses
-    	String num = "Number of courses: " + Integer.toString(v.size()) + "\n";
-    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + num);
-    	
     	listFilteredCourses(v);
     }
     
-    public void listFilteredCourses(List<Course> v) {
+    @FXML
+    public void initializeCourseSet() {
+    	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
     	list.clear();
     	for(int i = 0; i < v.size(); i++) {
     		String[] courseInfo = v.get(i).getTitle().split("-", 2);
     		String courseCode = courseInfo[0];
     		String name = courseInfo[1].substring(0, courseInfo[1].indexOf('(')-1);
     		
+    		String prevSection = "";
     		for(int j = 0; j < v.get(i).getNumSlots(); j++) {
     			String section = v.get(i).getSection(j).getCode();
+    			if(prevSection.equals(section)) {
+    				list.add(list.get(list.size()-1));
+    				continue;
+    			}
     			String instructor = "";
     			int k = 0;
     			while(k < v.get(i).getSlot(j).getInstNum()-1)
     				instructor += (v.get(i).getSlot(j).getInstructor(k++)+" / ");
     			instructor += v.get(i).getSlot(j).getInstructor(k);
     			CheckBox ch = new CheckBox();
-    			list.add(new courseData(courseCode, section, name, instructor, ch));
+    			ch.setOnAction(event -> {
+    				enrollSection();
+    			});
+    			courseData temp = new courseData(courseCode, section, name, instructor, ch);
+    			list.add(temp);
+    			prevSection = section;
+    		}
+    	}
+    }
+    
+    @FXML
+    void enrollSection() {
+    	textAreaConsole.clear();
+    	String output = "The following sections are enrolled:\n";
+    	String prevSection = "", prevCourseCode = "";
+    	for(int i = 0; i < list.size(); i++) {
+    		if(list.get(i).getEnroll().isSelected()) {
+    			if(prevSection.equals(list.get(i).getSection()) && prevCourseCode.equals(list.get(i).getCourseCode()))
+    				continue;
+    			output += list.get(i).getCourseCode()+" - "+list.get(i).getSection()+" - "+list.get(i).getName()+" - "+list.get(i).getInstructor()+"\n";
+    			prevSection = list.get(i).getSection();
+    			prevCourseCode = list.get(i).getCourseCode();
+    		}
+    	}
+    	textAreaConsole.setText(output);
+    }
+    
+    public void listFilteredCourses(List<Course> v) {
+    	listForPrint.clear();
+    	int indexV = 0;
+    	int indexSection = 0;
+    	String prevSection = "";
+    	for(int i = 0; i < list.size(); i++) {
+    		if(indexV >= v.size())
+    			break;
+    		if(v.get(indexV).getNumSlots() == 0) {
+    			indexV++;
+    			i--;
+    			continue;
     		}
     		
+    		// get slot info in v
+    		String[] courseInfo = v.get(indexV).getTitle().split("-", 2);
+    		String courseCodeV = courseInfo[0];
+    		
+    		if(listForPrint.size() != 0 
+    				&& (listForPrint.get(listForPrint.size()-1).getSection().equals(v.get(indexV).getSection(indexSection).getCode())
+    				&& listForPrint.get(listForPrint.size()-1).getCourseCode().equals(courseCodeV))) {
+    			if(indexSection >= v.get(indexV).getNumSlots()-1) {
+	    			indexSection = 0;
+	    			indexV++;
+	    		}
+	    		else
+	    			indexSection++;
+    			continue;
+    		}
+    			
+    		if(prevSection.equals(list.get(i).getSection())
+    				&& listForPrint.get(listForPrint.size()-1).getCourseCode().equals(list.get(i).getCourseCode()))
+    			continue;
+    		
+    		
+    		String nameV = v.get(indexV).getSection(indexSection).getCode();
+    		// Add slots that are in result of filtering only
+    		
+        	/*textAreaConsole.setText(textAreaConsole.getText()
+        			+courseCodeV+"\t"+nameV+"\t"
+        			+list.get(i).getCourseCode()+"\t"+list.get(i).getSection()+"\t"
+        			+courseCodeV.equals(list.get(i).getCourseCode())+"\t"
+        			+nameV.equals(list.get(i).getSection())
+        			+"\n");*/
+    		if(courseCodeV.equals(list.get(i).getCourseCode()) && nameV.equals(list.get(i).getSection())) {
+	    		listForPrint.add(list.get(i));
+	    		prevSection = list.get(i).getSection();
+	    		if(indexSection >= v.get(indexV).getNumSlots()-1) {
+	    			indexSection = 0;
+	    			indexV++;
+	    		}
+	    		else
+	    			indexSection++;
+    		}
     	}
-    	/*for(int i = 0; i < courseDataSet.size(); i++) {
-    		list.add(courseDataSet.get(i));
-    	}*/
     	
-    	courseTable.setItems(list);
+    	courseTable.setItems(listForPrint);
     	codeCol.setCellValueFactory(new PropertyValueFactory<courseData,String>("courseCode"));
     	sectionCol.setCellValueFactory(new PropertyValueFactory<courseData,String>("section"));
     	nameCol.setCellValueFactory(new PropertyValueFactory<courseData,String>("name"));
