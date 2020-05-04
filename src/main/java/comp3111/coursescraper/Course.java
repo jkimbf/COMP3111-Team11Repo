@@ -72,6 +72,10 @@ public class Course {
 		return counter;
 	}
 	
+	/**
+	 * @param section the section wants to search for
+	 * @param output array for slot indices match the input section
+	 */
 	public void getSectionIndex(String section, int[] output) {
 		int index = 0;
 		for(int i = 0; i < numSections; i++) {
@@ -80,7 +84,11 @@ public class Course {
 			}
 		}
 	}
-	
+
+	/**
+	 * @param section - section wants to search for
+	 * @param output - days of slots matching the input section
+	 */
 	public void getDaysOfSection(String section, int[] output) {
 		int index = 0;
 		for(int i = 0; i < numSections; i++) {
