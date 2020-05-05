@@ -7,8 +7,9 @@ public class Course {
 	private static final int DEFAULT_MAX_SECTION = 40;
 	
 	private String title ; 
-	private String description ;
+	private String description;
 	private String exclusion;
+	private String cc4Y;
 	private Slot [] slots;
 	private int numSlots;
 	private Section[] sections;
@@ -59,6 +60,43 @@ public class Course {
 		return null;
 	}
 	
+	/**
+	 * @param section - section ID
+	 * @return number of slots for the input section ID
+	 */
+	public int getNumSlotsForSec(String section) {
+		int counter = 0;
+		for(int i = 0; i < numSections; i++)
+			if(sections[i].getCode().equals(section))
+				counter++;
+		return counter;
+	}
+	
+	/**
+	 * @param section the section wants to search for
+	 * @param output array for slot indices match the input section
+	 */
+	public void getSectionIndex(String section, int[] output) {
+		int index = 0;
+		for(int i = 0; i < numSections; i++) {
+			if(sections[i].getCode().equals(section)) {
+				output[index++] = i;
+			}
+		}
+	}
+
+	/**
+	 * @param section - section wants to search for
+	 * @param output - days of slots matching the input section
+	 */
+	public void getDaysOfSection(String section, int[] output) {
+		int index = 0;
+		for(int i = 0; i < numSections; i++) {
+			if(sections[i].getCode().equals(section)) {
+				output[index++] = slots[i].getDay();
+			}
+		}
+	}
 
 	/**
 	 * @return the title
@@ -87,6 +125,20 @@ public class Course {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	
+	/**
+	 * @return the Common Core Information
+	 */
+	public String getCC4Y() {
+		return cc4Y;
+	}
+
+	/**
+	 * @param ccInfo: the Common Core information to set
+	 */
+	public void setCC4Y(String ccInfo) {
+		this.cc4Y = ccInfo;
+	}
 
 	/**
 	 * @return the exclusion
@@ -96,7 +148,7 @@ public class Course {
 	}
 
 	/**
-	 * @param exclusion the exclusion to set
+	 * @param exclusion: the exclusion to set
 	 */
 	public void setExclusion(String exclusion) {
 		this.exclusion = exclusion;

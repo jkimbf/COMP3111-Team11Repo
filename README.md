@@ -11,7 +11,7 @@
 
 > Task 1 & Task 6
 
-## 3. ...
-> email: ... | github: ... | dev branch: ...
+## 3. Yip Man Hong
+> email: mhyipad@connect.ust.hk | github: manhongyip | dev branch: manhongyip_dev
 
-> Task _ & Task _
+> Task 4 & Task 5
