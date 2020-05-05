@@ -118,8 +118,12 @@ public class Slot {
 	
 	// Print instructors for debugging. Should be deleted later
 	public void printInst() {
-		for(String inst : instructors) {
-			System.out.println(inst);
+//		for(String inst : instructors) {
+//			System.out.println(inst);
+//			System.out.println('\n');
+//		}
+		for (int i = 0; i < instructors.length; ++i) {
+			System.out.println(getInstructor(i));
 			System.out.println('\n');
 		}
 	}
