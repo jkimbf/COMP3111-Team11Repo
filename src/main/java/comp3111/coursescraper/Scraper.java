@@ -110,12 +110,11 @@ public class Scraper {
 			s.setInstructor(instructors.length);
 			for(String inst : instructors) {
 				// Delete unexpected "\n" before addition
-				if(inst.contains("\r") || inst.contains("\n") || inst.contains("\r\n")) {
-					s.addInstructor(inst.substring(0,inst.length()-1));
-				}
-				else {
-					s.addInstructor(inst);
-				}
+				inst = inst.replace("\r", "");
+				inst = inst.replace("\r\n", "");
+				inst = inst.replace("\n", "");
+				s.addInstructor(inst);
+				
 			}
 			c.addSlot(s);
 			
@@ -203,7 +202,7 @@ public class Scraper {
 					
 					// Get rid of Blank lines,Course Overall and Department Overall
 					if (title.asText().length() < 2 ||
-							title.asText().length() > 11)
+							title.asText().length() > 12)
 						continue;
 					
 					Course c = new Course();
@@ -221,4 +220,84 @@ public class Scraper {
 		}
 		return null;
 	}
+	
+	// For searching if an element exist in a list
+//	public boolean containsName(final List<SFQinstructor> list, final String name){
+//	    return list.stream().filter(SFQinstructor -> SFQinstructor.getName().equals(name)).findFirst().isPresent();
+//	}
+	
+	// For scraping SFQ instructors data only
+	public List<SFQinstructor> scrapeSFQinst(String baseurl) {
+
+		try {
+			HtmlPage page = client.getPage(baseurl);			
+			List<?> items = (List<?>) page.getByXPath(".//table");			
+			Vector<SFQinstructor> result = new Vector<SFQinstructor>();
+			
+			// 2 is the index for the first table
+			for (int i = 2; i < items.size()-1; i++) {				
+				HtmlElement table = (HtmlElement) items.get(i);
+				List<?> lines = (List<?>) table.getByXPath(".//tr");
+				
+				// lines(0) is garbage
+				for (int j = 1; j < lines.size(); ++j) {
+					HtmlElement line = (HtmlElement) lines.get(j);
+					List<?> cells = (List<?>) line.getByXPath(".//td");
+					
+					// Initialize the required variables
+					HtmlElement title = (HtmlElement) cells.get(0);
+					HtmlElement instructor = (HtmlElement) cells.get(2);
+					
+					// Get rid of Blank lines,Course Overall and Department Overall
+					if (title.asText().length() >= 2 ||
+							instructor.asText().length() < 3)
+						continue;
+					
+					HtmlElement COM = (HtmlElement) cells.get(3);
+					HtmlElement IOM = (HtmlElement) cells.get(4);
+					HtmlElement RR = (HtmlElement) cells.get(6);
+					
+					
+					boolean found = false;
+					for (SFQinstructor inst : result) {
+						if (inst.getName().compareTo(instructor.asText()) == 0) {
+							if(COM.asText().charAt(0) != '-') {
+								inst.SFQaddCOM(COM.asText().substring(0,4));
+							}
+							if(IOM.asText().charAt(0) != '-') {
+								inst.SFQaddIOM(IOM.asText().substring(0,4));
+							}
+							if(RR.asText().charAt(0) != '-') {
+								inst.SFQaddRR(RR.asText().substring(0,4));
+							}
+							found = true;
+							break;
+						}
+					}
+					if(found)
+						continue;
+
+					SFQinstructor inst = new SFQinstructor(instructor.asText());
+					if(COM.asText().charAt(0) != '-') {
+						inst.SFQaddCOM(COM.asText().substring(0,4));
+					}
+					if(IOM.asText().charAt(0) != '-') {
+						inst.SFQaddIOM(IOM.asText().substring(0,4));
+					}
+					if(RR.asText().charAt(0) != '-') {
+						inst.SFQaddRR(RR.asText().substring(0,4));
+					}
+					result.add(inst);
+				}
+			}
+			client.close();
+			return result;
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}	
+	
+	
+	
 }

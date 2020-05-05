@@ -78,12 +78,20 @@ public class Controller {
     
     @FXML
     void allSubjectSearch() {
-    	
+    	// For disabling SFQ button until Search button is clicked
+    	DISABLED = false;
+    	buttonSfqEnrollCourse.setDisable(DISABLED);
     }
 
     @FXML
     void findInstructorSfq() {
-    	buttonInstructorSfq.setDisable(true);
+    	List<SFQinstructor> v = scraperSFQ.scrapeSFQinst(textfieldSfqUrl.getText());
+    	for (SFQinstructor inst : v) {
+    		String newline = inst.getName() + " Course Overall Mean: " + inst.getCourseOverallMean() +
+    				" Instructor Overall Mean: " + inst.getInstructorOverallMean() + 
+    				" Response Rate: " + inst.getResponseRate() + "%";
+    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+    	}
     }
     
     // Should be true
@@ -91,12 +99,11 @@ public class Controller {
 
     @FXML
     void findSfqEnrollCourse() {
-    	// AllsubjectSearch condition to be implemented
     	buttonSfqEnrollCourse.setDisable(DISABLED);
     	if (DISABLED)
     		return;
     	List<Course> v = scraperSFQ.scrapeSFQ(textfieldSfqUrl.getText());
-    	for (Course c: v) {
+    	for (Course c : v) {
     		String newline = c.getTitle() + " Course Overall Mean: " + c.getCourseOverallMean() +
     				" Instructor Overall Mean: " + c.getInstructorOverallMean() + 
     				" Response Rate: " + c.getResponseRate();
@@ -106,8 +113,7 @@ public class Controller {
 
     @FXML
     void search() {
-    	// For diabling SFQ button until Search button is clicked
-    	// AllsubjectSearch condition to be implemented
+    	// For disabling SFQ button until Search button is clicked
     	DISABLED = false;
     	buttonSfqEnrollCourse.setDisable(DISABLED);
     	
@@ -119,12 +125,10 @@ public class Controller {
     		for(int i = 0; i < c.getNumSlots(); ++i) {
     			for(int j = 0; j < c.getSlot(i).getInstNum(); ++j) {
     				if(instructors.contains(c.getSlot(i).getInstructor(j))) {
-//    					System.out.println("exists " + c.getSlot(i).getInstructor(j));
     					continue;
     				}
     				else {
     					instructors.add(c.getSlot(i).getInstructor(j));
-//    					System.out.println("added " + c.getSlot(i).getInstructor(j));
     				}
     			}
     		}
@@ -137,7 +141,7 @@ public class Controller {
     			Section x = c.getSection(i);
     			newline += "Slot " + i + ":" + t + " Section " + x.toString() + "\n";
     			
-    			// Modify instructors
+    			// Display only the instructors who does not have teaching assignment at Tu 3:10 pm
     			LocalTime time = LocalTime.of(15, 10);
     			if(t.getDay() == 1 && t.getStart().isBefore(time) && t.getEnd().isAfter(time)) {
     				// remove from the instructor list
