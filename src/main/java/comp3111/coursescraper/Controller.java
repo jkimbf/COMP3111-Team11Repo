@@ -158,16 +158,22 @@ public class Controller {
     }    
     
     //public List<courseData> courseDataSet;
+    /**
+     * Initialize the list of courses scraped and the variables storing the previous URL, previous Term and previous Subject when program starts
+     */
     @FXML
-    public void initialize() {
+    protected void initialize() {
     	initializeCourseSet();
     	prevURL = textfieldURL.getText();
 	    prevTerm = textfieldTerm.getText();
 	    prevSubject = textfieldSubject.getText();
     }
     
+    /**
+     * For the Select-All button
+     */
     @FXML
-    void selectAll() {
+    protected void selectAll() {
     	boolean ind;
     	if(selectAllButton.getText().equals("Select All")) {
     		ind = true;
@@ -194,8 +200,11 @@ public class Controller {
     }
     
     // Need to be changed
+    /**
+     * Searches based on the filters applied and print in the console
+     */
     @FXML
-    void filterSearch() {
+    protected void filterSearch() {
     	if(!prevURL.equals(textfieldURL.getText()) || !prevTerm.equals(textfieldTerm.getText()) || !prevSubject.equals(textfieldSubject.getText())) {
     		initializeCourseSet();
     		prevURL = textfieldURL.getText();
@@ -499,8 +508,11 @@ public class Controller {
     	listFilteredCourses(v);
     }
     
+    /**
+     * To keep the enrollment status, list of all courses from the inputs are saved as courseData objects
+     */
     @FXML
-    public void initializeCourseSet() {
+    protected void initializeCourseSet() {
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
     	
     	// Check for 404 page not found
@@ -514,6 +526,7 @@ public class Controller {
 
     	
     	list.clear();
+    	int id = 0;
     	for(int i = 0; i < v.size(); i++) {
     		String[] courseInfo = v.get(i).getTitle().split("-", 2);
     		String courseCode = courseInfo[0];
@@ -535,6 +548,7 @@ public class Controller {
     			ch.setOnAction(event -> {
     				enrollSection();
     			});
+    			ch.setId("enroll"+ String.valueOf(id++));
     			courseData temp = new courseData(courseCode, section, name, instructor, ch);
     			list.add(temp);
     			prevSection = section;
@@ -542,8 +556,11 @@ public class Controller {
     	}
     }
     
+    /**
+     * Add the course with clicked buttons to the enrolled course list and print in the console
+     */
     @FXML
-    void enrollSection() {
+    protected void enrollSection() {
     	textAreaConsole.clear();
     	String output = "The following sections are enrolled:\n";
     	String prevSection = "", prevCourseCode = "";
@@ -559,7 +576,11 @@ public class Controller {
     	textAreaConsole.setText(output);
     }
     
-    public void listFilteredCourses(List<Course> v) {
+    /**
+     * Put courses from the Filter search result to the TableView in the List tab
+     * @param v list of courses from the filtering search
+     */
+    protected void listFilteredCourses(List<Course> v) {
     	listForPrint.clear();
     	int indexV = 0;
     	int indexSection = 0;
