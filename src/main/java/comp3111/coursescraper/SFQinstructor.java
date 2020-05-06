@@ -84,7 +84,7 @@ public class SFQinstructor {
 	
 	public void RRaverage() {
 		double totalRR = 0;
-		for(int i = 0; i < numIOM; ++i) {
+		for(int i = 0; i < numRR; ++i) {
 			totalRR += responseRate[i];
 		}
 		totalResponseRate = totalRR / numRR;
