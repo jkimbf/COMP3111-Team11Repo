@@ -1,8 +1,10 @@
 package comp3111.coursescraper;
 
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.List;
 
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
@@ -11,7 +13,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.DomText;
 import java.util.Vector;
-
 
 /**
  * WebScraper provide a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
@@ -85,7 +86,6 @@ public class Scraper {
 		client = new WebClient();
 		client.getOptions().setCssEnabled(false);
 		client.getOptions().setJavaScriptEnabled(false);
-
 	}
 
 	private void addSlot(HtmlElement e, Course c, boolean secondRow) {
@@ -174,10 +174,16 @@ public class Scraper {
 			}
 			client.close();
 			return result;
-		} catch (Exception e) {
-			System.out.println(e);
+		} 
+		
+		catch (Exception e) {
+			// 404 page not found
+			Vector<Course> error = new Vector<Course>();
+			Course x = new Course();
+			x.setTitle("404error");
+			error.add(x);
+			return error;
 		}
-		return null;
 	}
 	
 	// For scraping SFQ data only
@@ -220,16 +226,17 @@ public class Scraper {
 			}
 			client.close();
 			return result;
-		} catch (Exception e) {
-			System.out.println(e);
+		}		
+		
+		catch (Exception e) {
+			// 404 page not found
+			Vector<Course> error = new Vector<Course>();
+			Course x = new Course();
+			x.setTitle("404error");
+			error.add(x);
+			return error;
 		}
-		return null;
 	}
-	
-	// For searching if an element exist in a list
-//	public boolean containsName(final List<SFQinstructor> list, final String name){
-//	    return list.stream().filter(SFQinstructor -> SFQinstructor.getName().equals(name)).findFirst().isPresent();
-//	}
 	
 	// For scraping SFQ instructors data only
 	public List<SFQinstructor> scrapeSFQinst(String baseurl) {
@@ -297,10 +304,15 @@ public class Scraper {
 			}
 			client.close();
 			return result;
-		} catch (Exception e) {
-			System.out.println(e);
+		} 
+		
+		catch (Exception e) {
+			// 404 page not found
+			Vector<SFQinstructor> error = new Vector<SFQinstructor>();
+			SFQinstructor x = new SFQinstructor("404error");
+			error.add(x);
+			return error;
 		}
-		return null;
 	}	
 	
 	

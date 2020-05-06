@@ -149,6 +149,14 @@ public class Controller {
     
     private String prevSubject;
     
+    // Check for the URL validity
+    public String errorCheck(String error) {
+    	if (error.equals("404error"))
+    		return "404 page not found. Check if the URL is correct.";
+    	else
+    		return "No error";
+    }    
+    
     //public List<courseData> courseDataSet;
     @FXML
     public void initialize() {
@@ -196,6 +204,16 @@ public class Controller {
     	}
     	textAreaConsole.setText("");
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	
+    	// Check for 404 page not found
+    	if (!v.isEmpty()) {
+        	String error = errorCheck(v.get(0).getTitle());
+        	if (error != "No error") {
+        		textAreaConsole.setText(error);
+        		return;
+        	}
+    	}
+
     	
     	// Days
     	if(checkMon.isSelected() || checkTue.isSelected() || checkWed.isSelected() 
@@ -484,6 +502,17 @@ public class Controller {
     @FXML
     public void initializeCourseSet() {
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	
+    	// Check for 404 page not found
+    	if(!v.isEmpty()) {
+        	String error = errorCheck(v.get(0).getTitle());
+        	if (error != "No error") {
+        		textAreaConsole.setText(error);
+        		return;
+        	}
+    	}
+
+    	
     	list.clear();
     	for(int i = 0; i < v.size(); i++) {
     		String[] courseInfo = v.get(i).getTitle().split("-", 2);
@@ -599,11 +628,46 @@ public class Controller {
     	// For disabling SFQ button until Search button is clicked
     	DISABLED = false;
     	buttonSfqEnrollCourse.setDisable(DISABLED);
+    	
+    	
+    	// Check for 404 page not found
+//    	if (VARIABLE_NAME_OF_THE_LIST.isEmpty()) {
+//    		textAreaConsole.setText("404 page not found. Check if the URL is correct.");
+//    		return;
+//    	}
+//    	if (!VARIABLE_NAME_OF_THE_LIST.isEmpty()) {
+//        	String error = errorCheck(VARIABLE_NAME_OF_THE_LIST.get(0).getTitle());
+//        	if (error != "No error") {
+//        		textAreaConsole.setText(error);
+//        		return;
+//        	}
+//    	}
+
+    		
+    	
+    	
     }
 
     @FXML
     void findInstructorSfq() {
+    	textAreaConsole.setText("");
     	List<SFQinstructor> v = scraperSFQ.scrapeSFQinst(textfieldSfqUrl.getText());
+    	
+    	
+    	// Check for 404 page not found
+    	if (v.isEmpty()) {
+    		textAreaConsole.setText("404 page not found. Check if the URL is correct.");
+    		return;
+    	}
+    	if (!v.isEmpty()) {
+        	String error = errorCheck(v.get(0).getName());
+        	if (error != "No error") {
+        		textAreaConsole.setText(error);
+        		return;
+        	}
+    	}
+
+    	
     	for (SFQinstructor inst : v) {
     		String newline = inst.getName() + " Course Overall Mean: " + inst.getCourseOverallMean() +
     				" Instructor Overall Mean: " + inst.getInstructorOverallMean() + 
@@ -617,17 +681,44 @@ public class Controller {
 
     @FXML
     void findSfqEnrollCourse() {
+    	textAreaConsole.setText("");
     	buttonSfqEnrollCourse.setDisable(DISABLED);
     	if (DISABLED)
     		return;
     	List<Course> v = scraperSFQ.scrapeSFQ(textfieldSfqUrl.getText());
-    	for (Course c : v) {
-    		String newline = c.getTitle() + " Course Overall Mean: " + c.getCourseOverallMean() +
-    				" Instructor Overall Mean: " + c.getInstructorOverallMean() + 
-    				" Response Rate: " + c.getResponseRate();
-    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+    	
+    	// Check for 404 page not found
+    	if (v.isEmpty()) {
+    		textAreaConsole.setText("404 page not found. Check if the URL is correct.");
+    		return;
+    	}
+    	if (!v.isEmpty()) {
+        	String error = errorCheck(v.get(0).getTitle());
+        	if (error != "No error") {
+        		textAreaConsole.setText(error);
+        		return;
+        	}
+    	}
+
+    	
+    	String prev = "";
+    	for (courseData d : list) {
+    		if (!d.getEnroll().isSelected() || prev == d.getCourseCode())
+    			continue;
+    		for (Course c : v) {
+    			if (d.getCourseCode().contentEquals(c.getTitle().substring(1))) {
+    	    		prev = d.getCourseCode();
+    				String newline = c.getTitle().substring(1) + " Course Overall Mean: " + c.getCourseOverallMean() +
+    	    				" Instructor Overall Mean: " + c.getInstructorOverallMean() + 
+    	    				" Response Rate: " + c.getResponseRate();
+    	    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+    	    		break;
+    			}
+    		}
     	}    	
     }
+    
+
 
     @FXML
     void search() {
@@ -635,8 +726,17 @@ public class Controller {
     	// For disabling SFQ button until Search button is clicked
     	DISABLED = false;
     	buttonSfqEnrollCourse.setDisable(DISABLED);
-    	
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	
+    	// Check for 404 page not found
+    	if (!v.isEmpty()) {
+        	String error = errorCheck(v.get(0).getTitle());
+        	if (error != "No error") {
+        		textAreaConsole.setText(error);
+        		return;
+        	}
+    	}
+    	
     	PriorityQueue<String> instructors = new PriorityQueue<String>();
     	
     	// Add all instructors to the list
@@ -689,15 +789,15 @@ public class Controller {
     	}
     	
     	// Print total number of sections
-    	String secNum = "Number of sections: " + Integer.toString(numSections) + "\n";
+    	String secNum = "Total Number of different sections in this search: " + Integer.toString(numSections) + "\n";
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + secNum);
     	
     	// Print total number of courses
-    	String num = "Number of courses: " + Integer.toString(numCourses) + "\n";
+    	String num = "Total Number of Courses in this search: " + Integer.toString(numCourses) + "\n";
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + num);
     	
     	// Print instructors on the console
-    	String line = "Instructors free: ";
+    	String line = "Instructors who has teaching assignment this term but does not need to teach at Tu 3:10pm: \n";
     	while(!instructors.isEmpty()) {
     		line += "\"" + instructors.remove() + "\", ";
     	}
