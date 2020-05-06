@@ -229,7 +229,7 @@ public class Task_1_and_6 extends ApplicationTest {
 	@Test
 	public void testScrapeSFQinstructors() {
 		clickOn("#tabSfq");
-		clickOn("#buttonSfqEnrollCourse");
+		clickOn("#buttonInstructorSfq");
 		
 		Button b = (Button)s.lookup("#buttonSfqEnrollCourse");
 		TextArea textAreaConsole = (TextArea)s.lookup("#textAreaConsole");
