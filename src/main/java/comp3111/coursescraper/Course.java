@@ -61,7 +61,9 @@ public class Course {
 	}
 	
 	/**
-	 * @param section - section ID
+	 * Calculates the number of slots having the input section as their section
+	 * 
+	 * @param section the section ID
 	 * @return number of slots for the input section ID
 	 */
 	public int getNumSlotsForSec(String section) {
@@ -73,6 +75,8 @@ public class Course {
 	}
 	
 	/**
+	 * Put indices of slots with the input section String for their sections in the "output" array that is an input
+	 * 
 	 * @param section the section wants to search for
 	 * @param output array for slot indices match the input section
 	 */
@@ -86,6 +90,8 @@ public class Course {
 	}
 
 	/**
+	 * Put days of the slots with the input section String for their sections
+	 * 
 	 * @param section - section wants to search for
 	 * @param output - days of slots matching the input section
 	 */
