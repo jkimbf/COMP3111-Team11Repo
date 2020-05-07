@@ -149,6 +149,16 @@ public class Controller {
     
     private String prevSubject;
     
+    private boolean click=false; //detect in Allsubjectsearch
+    
+    private int counteri=0;
+
+  
+    
+    
+    
+
+    
     // Check for the URL validity
     public String errorCheck(String error) {
     	if (error.equals("404error"))
@@ -647,15 +657,126 @@ public class Controller {
     
     @FXML
     void updateTimetable() {
-    	// Chucky
+    	//timetable change start
+    	
+    	int test=0;
+    	String prech="";
+    	AnchorPane ap= (AnchorPane)tabTimetable.getContent();
+
+    	//get original table index
+    	if(counteri==0)
+    	counteri=ap.getChildren().size()-1;
+    	
+    	//initialize table
+    	ap.getChildren().remove(counteri, ap.getChildren().size());
+    	
+
+    	
+   	 
+    	
+    	for(int i = 0; i < list.size(); i++) {
+    			
+    	    if(list.get(i).getEnroll().isSelected()) {
+    	    	
+    	    	Random rand = new Random();
+    	    	int r = rand.nextInt(255);
+    	    	int g = rand.nextInt(255);
+    	    	int b = rand.nextInt(255);
+    	    	Color randomColor = Color.rgb(r, g, b, 0.1);
+
+
+    	    	
+    	    	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	    	double start=0,end=0,day=0;
+    	    	for(int j=0;j<v.size();j++)
+    	    	{
+    	    		String[] courseInfo = v.get(j).getTitle().split("-", 2);
+    	    					String code=courseInfo[0];
+    		
+    	    		if(code.equals(list.get(i).getCourseCode()))
+    	    		{
+    	    			
+    	    			
+    	    			for(int k=0;k<v.get(j).getNumSlots();k++)
+    	    			{
+    	    				String ch;
+    	    				
+    	    				ch =v.get(j).getSection(k).getCode();
+    	    				//check case : System.out.println("ch: " + ch);
+    	    				//check case: System.out.println("real ch: " + list.get(i).getSection());
+    	    				if(ch.equals(list.get(i).getSection()))
+    	    				{	
+    	    					if(prech.contentEquals(code+ch) && test!=i)continue;
+    	    					
+    	    					//check case: System.out.println(code + ch + " Day: " + v.get(j).getSlot(k).getDay() + " Time: " + v.get(j).getSlot(k).getStartHour()+v.get(j).getSlot(k).getStartMinute() + " - " + v.get(j).getSlot(k).getEndHour()+v.get(j).getSlot(k).getEndMinute());
+    	    					prech=code+ch;test=i;
+    	    					
+    	    					
+    	    					
+    	    					start = ((float)v.get(j).getSlot(k).getStartHour()-9)*20;
+    	    					start +=((float)v.get(j).getSlot(k).getStartMinute()/3);
+    	    					
+    	    					end = (float) (v.get(j).getSlot(k).getEndHour()-v.get(j).getSlot(k).getStartHour())*20;
+    	    					end +=(float)(v.get(j).getSlot(k).getEndMinute()-v.get(j).getSlot(k).getStartMinute())/3;
+    	    					
+    	    					day= (float)v.get(j).getSlot(k).getDay()*100+102; //102 is initial value, *100 is interval
+    	    					
+    	    	    	    	Label randomLabel = new Label(list.get(i).getCourseCode() + "\n" + list.get(i).getSection());
+
+    	    	    	    	
+    	    	    	    	randomLabel.setBackground(new Background(new BackgroundFill(randomColor , CornerRadii.EMPTY, Insets.EMPTY)));
+    	    	    	    	randomLabel.setLayoutX(day);
+    	    	    	    	randomLabel.setLayoutY(start+45); // 65-45= y+20= 1 hour ,45 is initial value, 20 is interval of 1 hour
+    	    	    	    	randomLabel.setMinWidth(100.0);
+    	    	    	    	randomLabel.setMaxWidth(100.0);
+    	    	    	    	randomLabel.setMinHeight(end);
+    	    	    	    	randomLabel.setMaxHeight(end+5);
+    	    	    	    	ap.getChildren().addAll(randomLabel);
+    	    					
+    	    						
+    	    				}
+    	    			}
+    	    		}
+    	    	}
+    	
+
+    	   	  }
+    	    }
     }
-    
+   //timetable end
     @FXML
     void allSubjectSearch() {
     	// For disabling SFQ button until Search button is clicked
-    	DISABLED = false;
+       	DISABLED = false;
     	buttonSfqEnrollCourse.setDisable(DISABLED);
-    	
+    	click=!click;
+    	int count=0;
+    	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+
+        		if(click)
+        			{textAreaConsole.setText("Total Number of Categories/Code Prefix: " + v.size());
+        			double progress=0.0f;
+        			progressbar.setProgress(progress);
+        			
+        			}
+       
+        		if(!click && v.size()!=0)
+        		{
+        			double progress=0.0f;
+        		for(int i=0;i<v.size();i++) {
+
+        		    	System.out.println(v.get(i).getTitle() + " is done");
+        		    	progress=(float)i/v.size() ;
+
+        		    	progressbar.setProgress(progress);
+        		    	
+        		    	String[] courseInfo = v.get(i).getTitle().split("-", 2);
+    					String code=courseInfo[0];
+        		    	if(code!="")count++;
+        		    }
+        		textAreaConsole.setText("Total Number of Courses fetched: " + count);
+        		
+        		}
     	
     	// Check for 404 page not found
 //    	if (VARIABLE_NAME_OF_THE_LIST.isEmpty()) {
