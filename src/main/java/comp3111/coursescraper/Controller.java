@@ -547,6 +547,7 @@ public class Controller {
     			CheckBox ch = new CheckBox();
     			ch.setOnAction(event -> {
     				enrollSection();
+    				updateTimetable();
     			});
     			ch.setId("enroll"+ String.valueOf(id++));
     			courseData temp = new courseData(courseCode, section, name, instructor, ch);
@@ -642,6 +643,11 @@ public class Controller {
     	nameCol.setCellValueFactory(new PropertyValueFactory<courseData,String>("name"));
     	instructorCol.setCellValueFactory(new PropertyValueFactory<courseData,String>("instructor"));
     	enrollCol.setCellValueFactory(new PropertyValueFactory<courseData,CheckBox>("enroll"));
+    }
+    
+    @FXML
+    void updateTimetable() {
+    	// Chucky
     }
     
     @FXML
