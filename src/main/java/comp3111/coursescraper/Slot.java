@@ -96,32 +96,49 @@ public class Slot {
 		this.day = day;
 	}
 	
-	// initialize instructors
+	/**
+	 * Initialize instructor array
+	 * 
+	 * @param size is the maximum number of instructors for a slot
+	 */
 	public void setInstructor(int size) {
 		instructors = new String[size];
 		instNum = 0;
 	}
 	
-	// Add instructor
+	/**
+	 * Add an instructor to the slot
+	 * 
+	 * @param x is the name of the instructor
+	 */
 	public void addInstructor(String x) {
 		instructors[instNum] = x;
 		++instNum;
 	}
 	
+	/**
+	 * Get the instructor
+	 * 
+	 * @param 	i is the index for finding an instructor
+	 * @return	the instructor at i
+	 */
 	public String getInstructor(int i) {
 		return instructors[i];
 	}
 	
+	/**
+	 * Get the number of instructors
+	 * 
+	 * @return	the number of instructors for this slot
+	 */
 	public int getInstNum() {
 		return instNum;
 	}
 	
-	// Print instructors for debugging. Should be deleted later
+	/**
+	 * Print all the instructors in this slot
+	 */
 	public void printInst() {
-//		for(String inst : instructors) {
-//			System.out.println(inst);
-//			System.out.println('\n');
-//		}
 		for (int i = 0; i < instructors.length; ++i) {
 			System.out.println(getInstructor(i));
 			System.out.println('\n');

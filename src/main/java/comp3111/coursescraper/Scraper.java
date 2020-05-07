@@ -126,7 +126,14 @@ public class Scraper {
 
 	}
 
-
+	/**
+	 * Scrape data for each course.
+	 * 
+	 * @param	baseurl is the url to look for the data
+	 * @param	term is the term to look for
+	 * @param	sub is the subject to look for
+	 * @return	a list of courses scraped from the URL
+	 */
 	public List<Course> scrape(String baseurl, String term, String sub) {
 
 		try {			
@@ -186,7 +193,12 @@ public class Scraper {
 		}
 	}
 	
-	// For scraping SFQ data only
+	/**
+	 * Scrape SFQ data for each course.
+	 * 
+	 * @param	baseurl is the url to look for the data
+	 * @return	a list of courses scraped from the URL
+	 */
 	public List<Course> scrapeSFQ(String baseurl) {
 
 		try {			
@@ -238,7 +250,12 @@ public class Scraper {
 		}
 	}
 	
-	// For scraping SFQ instructors data only
+	/**
+	 * Scrape SFQ data for each instructor.
+	 * 
+	 * @param 	baseurl is the url to look for the data
+	 * @return	a list of SFQinstructors scraped from the URL
+	 */
 	public List<SFQinstructor> scrapeSFQinst(String baseurl) {
 
 		try {

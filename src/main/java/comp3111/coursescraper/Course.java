@@ -45,6 +45,11 @@ public class Course {
 		return null;
 	}
 	
+	/**
+	 * This function adds a section to the course.
+	 * 
+	 * @param s is a Section object to be added.
+	 */
 	public void addSection(Section s) {
 		if (numSections >= DEFAULT_MAX_SECTION)
 			return;		
@@ -54,6 +59,12 @@ public class Course {
 			--actualNumSec;
 	}
 	
+	/**
+	 * Get the section at the index i
+	 * 
+	 * @param i is an index for a section in the course.
+	 * @return the Section stored at i
+	 */
 	public Section getSection(int i) {
 		if (i >= 0 && i < numSections)
 			return sections[i];
@@ -174,47 +185,65 @@ public class Course {
 		this.numSlots = numSlots;
 	}
 	
-	// get the actual number of Sections
+	/**
+	 * @return the actual number of Sections
+	 */
 	public int getNumSections() {
 		return actualNumSec;
 	}
 	
-	// set the Course Overall Mean
+	/**
+	 * @param CourseOverallMean becomes CourseOverallMean of the course
+	 */
 	public void setCourseOverallMean(String CourseOverallMean) {
 		this.CourseOverallMean = CourseOverallMean;
 	}
 	
-	// get the Course Overall Mean
+	/**
+	 * @return the Course Overall Mean
+	 */
 	public String getCourseOverallMean() {
 		return CourseOverallMean;
 	}
 	
-	// set the Instructor Overall Mean
+	/**
+	 * @param InstructorOverallMean becomes InstructorOverallMean of the course
+	 */
 	public void setInstructorOverallMean(String InstructorOverallMean) {
 		this.InstructorOverallMean = InstructorOverallMean;
 	}
 	
-	// get the Instructor Overall Mean
+	/**
+	 * @return the Instructor Overall Mean
+	 */
 	public String getInstructorOverallMean() {
 		return InstructorOverallMean;
 	}
 	
-	// set the Response Rate
+	/**
+	 * @param ResponseRate becomes ResponseRate of the course
+	 */
 	public void setResponseRate(String ResponseRate) {
 		this.ResponseRate = ResponseRate;
 	}
 	
-	// get the Response Rate
+	/**
+	 * @return the Response Rate
+	 */
 	public String getResponseRate() {
 		return ResponseRate;
 	}
 	
-	// Add one to the actual number of sections
+	/**
+	 * Add one to the actual number of sections
+	 */
 	public void addOneToActualNumSec() {
 		++actualNumSec;
 	}
 	
-	// Subtract one to the actual number of sections
+	/**
+	 * Subtract one to the actual number of sections
+	 */
 	public void subtractOneToActualNumSec() {
 		--actualNumSec;
 	}
