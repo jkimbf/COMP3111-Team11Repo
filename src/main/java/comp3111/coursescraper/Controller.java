@@ -149,13 +149,25 @@ public class Controller {
     
     private String prevSubject;
     
-    // Check for the URL validity
+	/**
+	 * Check the URL validity
+	 * 
+	 * @param 	error contains error statement only if there is an error
+	 * @return	returns 404 page not found if there is error, no error otherwise
+	 */
     public String errorCheck(String error) {
     	if (error.equals("404error"))
     		return "404 page not found. Check if the URL is correct.";
     	else
     		return "No error";
-    }    
+    }
+    
+    // Should be true
+	/**
+	 * Set to true before search or subject search is clicked
+	 * SFQ button is disabled when true.
+	 */
+	private boolean DISABLED = true;
     
     //public List<courseData> courseDataSet;
     /**
@@ -669,6 +681,14 @@ public class Controller {
     	
     }
 
+	/**
+	 * Scrape and prints instructors' SFQ data
+	 * <p>
+	 * This function scrape data from the SFQ web site and 
+	 * get the average SFQ data for each instructor on the
+	 * web site.
+	 * </p>
+	 */
     @FXML
     void findInstructorSfq() {
     	textAreaConsole.setText("");
@@ -697,9 +717,16 @@ public class Controller {
     	}
     }
     
-    // Should be true
-	private boolean DISABLED = true;
 
+
+	/**
+	 * Scrape and print SFQ data for each course.
+	 * <p>
+	 * This function scrape data from the SFQ web site and 
+	 * get the average SFQ data for each course on the web 
+	 * site.
+	 * </p>
+	 */
     @FXML
     void findSfqEnrollCourse() {
     	textAreaConsole.setText("");
@@ -740,7 +767,13 @@ public class Controller {
     }
     
 
-
+	/**
+	 * Scrape and print data for each course
+	 * <p>
+	 * This function scrape data from the course catalog 
+	 * web site to get the information for each section. 
+	 * </p>
+	 */
     @FXML
     void search() {
     	textAreaConsole.setText("");

@@ -1,6 +1,14 @@
 package comp3111.coursescraper;
 
-// This class is merely used for storing SFQ data of the instructors.
+/**
+ * <p>
+ * A class for storing SFQ data for each instructor. SFQ data includes course overall mean, 
+ * instructor overall mean, response rate.
+ * </p>
+ * 
+ * @author HWANG, Junyeol
+ * 
+ */
 public class SFQinstructor {
 	private static final int DEFAULT_MAX_SECTION = 40;
 	
@@ -15,6 +23,9 @@ public class SFQinstructor {
 	private int numRR;
 	private String name;
 	
+	/**
+	 * @param name is the name of the instructor and stored as name.
+	 */
 	public SFQinstructor(String name) {
 		this.courseOverallMean = new double[DEFAULT_MAX_SECTION];
 		this.instructorOverallMean = new double[DEFAULT_MAX_SECTION];
@@ -27,6 +38,10 @@ public class SFQinstructor {
 		this.name = name;
 	}
 	
+	/**
+	 * Add a course overall mean value for the instructor
+	 * @param COM is the Course overall mean to be added for this instructor
+	 */
 	public void SFQaddCOM(String COM) {
 		double dCOM;
 		if(COM.contains("(")) {
@@ -40,6 +55,10 @@ public class SFQinstructor {
 		COMaverage();
 	}
 	
+	/**
+	 * Add an instructor overall mean value for the instructor
+	 * @param IOM is the Instructor overall mean to be added for this instructor
+	 */
 	public void SFQaddIOM(String IOM) {
 		double dIOM;
 		if(IOM.contains("(")) {
@@ -53,6 +72,10 @@ public class SFQinstructor {
 		IOMaverage();
 	}
 	
+	/**
+	 * Add a response rate value for the instructor
+	 * @param RR is the Response rate to be added for this instructor
+	 */
 	public void SFQaddRR(String RR) {
 		double dRR;
 		if(RR.contains("%")) {
@@ -66,6 +89,9 @@ public class SFQinstructor {
 		RRaverage();
 	}
 	
+	/**
+	 * Calculate the average of the Course overall mean and save it as totalCourseOverallMean
+	 */
 	public void COMaverage() {
 		double totalCOM = 0;
 		for(int i = 0; i < numCOM; ++i) {
@@ -74,6 +100,9 @@ public class SFQinstructor {
 		totalCourseOverallMean = totalCOM / numCOM;
 	}
 	
+	/**
+	 * Calculate the average of the Instructor overall mean and save it as totalInstructorOverallMean
+	 */
 	public void IOMaverage() {
 		double totalIOM = 0;
 		for(int i = 0; i < numIOM; ++i) {
@@ -82,6 +111,9 @@ public class SFQinstructor {
 		totalInstructorOverallMean = totalIOM / numIOM;
 	}
 	
+	/**
+	 * Calculate the average of the Response rate and save it as totalResponseRate
+	 */
 	public void RRaverage() {
 		double totalRR = 0;
 		for(int i = 0; i < numRR; ++i) {
@@ -90,10 +122,19 @@ public class SFQinstructor {
 		totalResponseRate = totalRR / numRR;
 	}
 	
+	/**
+	 * Get the name
+	 * @return the name of the instructor
+	 */
 	public String getName() {
 		return name;
 	}
 	
+	/**
+	 * Get the average course overall mean
+	 * 
+	 * @return the average course overall mean
+	 */
 	public String getCourseOverallMean() {
 		if(numCOM == 0)
 			return "-";
@@ -102,6 +143,10 @@ public class SFQinstructor {
 //			return Double.toString(totalCourseOverallMean);
 	}
 	
+	/**
+	 * Get the average instructor overall mean
+	 * @return the average instructor overall mean
+	 */
 	public String getInstructorOverallMean() {
 		if(numIOM == 0)
 			return "-";
@@ -109,6 +154,10 @@ public class SFQinstructor {
 			return String.format("%.1f", totalInstructorOverallMean);
 	}
 	
+	/**
+	 * Get the average response rate
+	 * @return the average response rate
+	 */
 	public String getResponseRate() {
 		if(numRR == 0)
 			return "-";
