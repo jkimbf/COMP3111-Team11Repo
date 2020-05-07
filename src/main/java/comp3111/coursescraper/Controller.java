@@ -752,7 +752,18 @@ public class Controller {
     	click=!click;
     	int count=0;
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
-
+        // Check for 404 page not found
+    	if (v.isEmpty()) {
+    		textAreaConsole.setText("404 page not found. Check if the URL is correct.");
+    		return;
+    	}
+    	if (!v.isEmpty()) {
+        	String error = errorCheck(VARIABLE_NAME_OF_THE_LIST.get(0).getTitle());
+        	if (error != "No error") {
+        		textAreaConsole.setText(error);
+        		return;
+        	}
+    	}
         		if(click)
         			{textAreaConsole.setText("Total Number of Categories/Code Prefix: " + v.size());
         			double progress=0.0f;
@@ -778,18 +789,7 @@ public class Controller {
         		
         		}
     	
-    	// Check for 404 page not found
-//    	if (VARIABLE_NAME_OF_THE_LIST.isEmpty()) {
-//    		textAreaConsole.setText("404 page not found. Check if the URL is correct.");
-//    		return;
-//    	}
-//    	if (!VARIABLE_NAME_OF_THE_LIST.isEmpty()) {
-//        	String error = errorCheck(VARIABLE_NAME_OF_THE_LIST.get(0).getTitle());
-//        	if (error != "No error") {
-//        		textAreaConsole.setText(error);
-//        		return;
-//        	}
-//    	}
+
 
     		
     	
