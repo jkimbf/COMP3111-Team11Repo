@@ -663,13 +663,13 @@ public class Controller {
     	String prech="";
     	AnchorPane ap= (AnchorPane)tabTimetable.getContent();
 
-    	//get original table index
+    	//get original table index. 
     	if(counteri==0)
     	counteri=ap.getChildren().size()-1;
     	
     	//initialize table
     	ap.getChildren().remove(counteri, ap.getChildren().size());
-    	
+    	 
 
     	
    	 
