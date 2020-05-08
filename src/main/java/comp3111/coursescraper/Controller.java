@@ -24,9 +24,12 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import java.util.Random;
-import java.util.ArrayList;
+import java.util.Vector;
+
 import java.util.List;
 import java.util.PriorityQueue;
 public class Controller {
@@ -72,6 +75,9 @@ public class Controller {
 
     @FXML
     private Button buttonSfqEnrollCourse;
+    
+    @FXML
+    private Button allSubjectSearch;
 
     @FXML
     private Button buttonInstructorSfq;
@@ -751,21 +757,40 @@ public class Controller {
     	buttonSfqEnrollCourse.setDisable(DISABLED);
     	click=!click;
     	int count=0;
-    	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	int subcount=0;
+    	//List<Course> v= new LinkedList<>();
+    	List<Course> v = new Vector<Course>();
+    	List<Course> temp = new Vector<Course>();
+    	String []sub= {"ACCT", "AESF", "BIBU","BIEN","BIPH","BTEC", "CBME", "CENG", "CHEM","CHMS", "CIEM", "CIVL", "COMP","CSIC", "CSIT", "ECON", "EEMT", "EESM","ELEC","EMBA","ENEG","ENGG", "ENTR", "ENVR", "ENVS", "EVNG","EVSM", "FINA","GBUS","GFIN","GNED", "HART", "HHMS", "HLTH","HMMA","HUMA", "IBTM","IDPO","IEDA","IIMP","IMBA", "ISDN", "ISOM", "JEVE","LABU","LANG", "LIFS", "MAED", "MAFS", "MARK", "MATH", "MECH","MESF","MFIT", "MGCS", "MGMT","MILE", "MIMT", "MSBD","MSDM","NANO", "OCES","PDEV", "PHYS","PPOL","RMBI", "SBMT","SCIE","SHSS", "SOSC","SSMA","SUST","TEMG", "UROP","WBBA"};
+    	for(int i=0;i<sub.length;i++)
+    	{textfieldSubject.setText(sub[i]);
+    	temp.clear();
+    	temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	subcount+=temp.size();
+    	for(int j=0;j<temp.size();j++)
+    	{
+    		if (temp.get(j).getTitle().equals("404error"))continue;
+    	
+    	v.add(temp.get(j));
+    	
+    	}
+    	
+    	}
+    	
         // Check for 404 page not found
     	if (v.isEmpty()) {
     		textAreaConsole.setText("404 page not found. Check if the URL is correct.");
     		return;
     	}
     	if (!v.isEmpty()) {
-        	String error = errorCheck(VARIABLE_NAME_OF_THE_LIST.get(0).getTitle());
+        	String error = errorCheck(v.get(0).getTitle());
         	if (error != "No error") {
         		textAreaConsole.setText(error);
         		return;
         	}
     	}
         		if(click)
-        			{textAreaConsole.setText("Total Number of Categories/Code Prefix: " + v.size());
+        			{textAreaConsole.setText("Total Number of Categories/Code Prefix: " + subcount);
         			double progress=0.0f;
         			progressbar.setProgress(progress);
         			
@@ -788,11 +813,6 @@ public class Controller {
         		textAreaConsole.setText("Total Number of Courses fetched: " + count);
         		
         		}
-    	
-
-
-    		
-    	
     	
     }
 
