@@ -24,9 +24,12 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import java.util.Random;
-import java.util.ArrayList;
+import java.util.Vector;
+
 import java.util.List;
 import java.util.PriorityQueue;
 public class Controller {
@@ -72,6 +75,9 @@ public class Controller {
 
     @FXML
     private Button buttonSfqEnrollCourse;
+    
+    @FXML
+    private Button allSubjectSearch;
 
     @FXML
     private Button buttonInstructorSfq;
@@ -149,6 +155,13 @@ public class Controller {
     
     private String prevSubject;
     
+
+    private boolean click=false; //detect in Allsubjectsearch
+    
+    private int counteri=0;
+
+ 
+
 	/**
 	 * Check the URL validity
 	 * 
@@ -559,6 +572,7 @@ public class Controller {
     			CheckBox ch = new CheckBox();
     			ch.setOnAction(event -> {
     				enrollSection();
+    				updateTimetable();
     			});
     			ch.setId("enroll"+ String.valueOf(id++));
     			courseData temp = new courseData(courseCode, section, name, instructor, ch);
@@ -657,27 +671,157 @@ public class Controller {
     }
     
     @FXML
+    void updateTimetable() {
+    	//timetable change start
+    	
+    	int test=0;
+    	String prech="";
+    	AnchorPane ap= (AnchorPane)tabTimetable.getContent();
+
+    	//get original table index. 
+    	if(counteri==0)
+    	counteri=ap.getChildren().size()-1;
+    	
+    	//initialize table
+    	ap.getChildren().remove(counteri, ap.getChildren().size());
+    	 
+
+    	
+   	 
+    	
+    	for(int i = 0; i < list.size(); i++) {
+    			
+    	    if(list.get(i).getEnroll().isSelected()) {
+    	    	
+    	    	Random rand = new Random();
+    	    	int r = rand.nextInt(255);
+    	    	int g = rand.nextInt(255);
+    	    	int b = rand.nextInt(255);
+    	    	Color randomColor = Color.rgb(r, g, b, 0.1);
+
+
+    	    	
+    	    	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	    	double start=0,end=0,day=0;
+    	    	for(int j=0;j<v.size();j++)
+    	    	{
+    	    		String[] courseInfo = v.get(j).getTitle().split("-", 2);
+    	    					String code=courseInfo[0];
+    		
+    	    		if(code.equals(list.get(i).getCourseCode()))
+    	    		{
+    	    			
+    	    			
+    	    			for(int k=0;k<v.get(j).getNumSlots();k++)
+    	    			{
+    	    				String ch;
+    	    				
+    	    				ch =v.get(j).getSection(k).getCode();
+    	    				//check case : System.out.println("ch: " + ch);
+    	    				//check case: System.out.println("real ch: " + list.get(i).getSection());
+    	    				if(ch.equals(list.get(i).getSection()))
+    	    				{	
+    	    					if(prech.contentEquals(code+ch) && test!=i)continue;
+    	    					
+    	    					//check case: System.out.println(code + ch + " Day: " + v.get(j).getSlot(k).getDay() + " Time: " + v.get(j).getSlot(k).getStartHour()+v.get(j).getSlot(k).getStartMinute() + " - " + v.get(j).getSlot(k).getEndHour()+v.get(j).getSlot(k).getEndMinute());
+    	    					prech=code+ch;test=i;
+    	    					
+    	    					
+    	    					
+    	    					start = ((float)v.get(j).getSlot(k).getStartHour()-9)*20;
+    	    					start +=((float)v.get(j).getSlot(k).getStartMinute()/3);
+    	    					
+    	    					end = (float) (v.get(j).getSlot(k).getEndHour()-v.get(j).getSlot(k).getStartHour())*20;
+    	    					end +=(float)(v.get(j).getSlot(k).getEndMinute()-v.get(j).getSlot(k).getStartMinute())/3;
+    	    					
+    	    					day= (float)v.get(j).getSlot(k).getDay()*100+102; //102 is initial value, *100 is interval
+    	    					
+    	    	    	    	Label randomLabel = new Label(list.get(i).getCourseCode() + "\n" + list.get(i).getSection());
+
+    	    	    	    	
+    	    	    	    	randomLabel.setBackground(new Background(new BackgroundFill(randomColor , CornerRadii.EMPTY, Insets.EMPTY)));
+    	    	    	    	randomLabel.setLayoutX(day);
+    	    	    	    	randomLabel.setLayoutY(start+45); // 65-45= y+20= 1 hour ,45 is initial value, 20 is interval of 1 hour
+    	    	    	    	randomLabel.setMinWidth(100.0);
+    	    	    	    	randomLabel.setMaxWidth(100.0);
+    	    	    	    	randomLabel.setMinHeight(end);
+    	    	    	    	randomLabel.setMaxHeight(end+5);
+    	    	    	    	ap.getChildren().addAll(randomLabel);
+    	    					
+    	    						
+    	    				}
+    	    			}
+    	    		}
+    	    	}
+    	
+
+    	   	  }
+    	    }
+    }
+   //timetable end
+    @FXML
     void allSubjectSearch() {
     	// For disabling SFQ button until Search button is clicked
-    	DISABLED = false;
+       	DISABLED = false;
     	buttonSfqEnrollCourse.setDisable(DISABLED);
+    	click=!click;
+    	int count=0;
+    	int subcount=0;
+    	//List<Course> v= new LinkedList<>();
+    	List<Course> v = new Vector<Course>();
+    	List<Course> temp = new Vector<Course>();
+    	String []sub= {"ACCT", "AESF", "BIBU","BIEN","BIPH","BTEC", "CBME", "CENG", "CHEM","CHMS", "CIEM", "CIVL", "COMP","CSIC", "CSIT", "ECON", "EEMT", "EESM","ELEC","EMBA","ENEG","ENGG", "ENTR", "ENVR", "ENVS", "EVNG","EVSM", "FINA","GBUS","GFIN","GNED", "HART", "HHMS", "HLTH","HMMA","HUMA", "IBTM","IDPO","IEDA","IIMP","IMBA", "ISDN", "ISOM", "JEVE","LABU","LANG", "LIFS", "MAED", "MAFS", "MARK", "MATH", "MECH","MESF","MFIT", "MGCS", "MGMT","MILE", "MIMT", "MSBD","MSDM","NANO", "OCES","PDEV", "PHYS","PPOL","RMBI", "SBMT","SCIE","SHSS", "SOSC","SSMA","SUST","TEMG", "UROP","WBBA"};
+    	for(int i=0;i<sub.length;i++)
+    	{textfieldSubject.setText(sub[i]);
+    	temp.clear();
+    	temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	subcount+=temp.size();
+    	for(int j=0;j<temp.size();j++)
+    	{
+    		if (temp.get(j).getTitle().equals("404error"))continue;
     	
+    	v.add(temp.get(j));
     	
-    	// Check for 404 page not found
-//    	if (VARIABLE_NAME_OF_THE_LIST.isEmpty()) {
-//    		textAreaConsole.setText("404 page not found. Check if the URL is correct.");
-//    		return;
-//    	}
-//    	if (!VARIABLE_NAME_OF_THE_LIST.isEmpty()) {
-//        	String error = errorCheck(VARIABLE_NAME_OF_THE_LIST.get(0).getTitle());
-//        	if (error != "No error") {
-//        		textAreaConsole.setText(error);
-//        		return;
-//        	}
-//    	}
+    	}
+    	
+    	}
+    	
+        // Check for 404 page not found
+    	if (v.isEmpty()) {
+    		textAreaConsole.setText("404 page not found. Check if the URL is correct.");
+    		return;
+    	}
+    	if (!v.isEmpty()) {
+        	String error = errorCheck(v.get(0).getTitle());
+        	if (error != "No error") {
+        		textAreaConsole.setText(error);
+        		return;
+        	}
+    	}
+        		if(click)
+        			{textAreaConsole.setText("Total Number of Categories/Code Prefix: " + subcount);
+        			double progress=0.0f;
+        			progressbar.setProgress(progress);
+        			
+        			}
+       
+        		if(!click && v.size()!=0)
+        		{
+        			double progress=0.0f;
+        		for(int i=0;i<v.size();i++) {
 
-    		
-    	
+        		    	System.out.println(v.get(i).getTitle() + " is done");
+        		    	progress=(float)i/v.size() ;
+
+        		    	progressbar.setProgress(progress);
+        		    	
+        		    	String[] courseInfo = v.get(i).getTitle().split("-", 2);
+    					String code=courseInfo[0];
+        		    	if(code!="")count++;
+        		    }
+        		textAreaConsole.setText("Total Number of Courses fetched: " + count);
+        		
+        		}
     	
     }
 
