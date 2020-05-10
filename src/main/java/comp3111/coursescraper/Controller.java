@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 
 import java.util.Random;
 import java.util.Vector;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 public class Controller {
@@ -147,6 +147,12 @@ public class Controller {
     private ObservableList<courseData> list = FXCollections.observableArrayList();
     
     @FXML
+    private ObservableList<courseData> listAll = FXCollections.observableArrayList();
+    
+    @FXML
+    private List<Course> allCourses;
+    
+    @FXML
     private ObservableList<courseData> listForPrint = FXCollections.observableArrayList();
     
     private String prevURL;
@@ -155,6 +161,7 @@ public class Controller {
     
     private String prevSubject;
     
+    private boolean filterAllSubjects = false;
 
     private boolean click=false; //detect in Allsubjectsearch
     
@@ -230,15 +237,21 @@ public class Controller {
      */
     @FXML
     protected void filterSearch() {
-    	if(!prevURL.equals(textfieldURL.getText()) || !prevTerm.equals(textfieldTerm.getText()) || !prevSubject.equals(textfieldSubject.getText())) {
-    		initializeCourseSet();
-    		prevURL = textfieldURL.getText();
-    	    prevTerm = textfieldTerm.getText();
-    	    prevSubject = textfieldSubject.getText();
+    	List<Course> v;
+    	if(!filterAllSubjects) {
+	    	if(!prevURL.equals(textfieldURL.getText()) || !prevTerm.equals(textfieldTerm.getText()) || !prevSubject.equals(textfieldSubject.getText())) {
+	    		initializeCourseSet();
+	    		prevURL = textfieldURL.getText();
+	    	    prevTerm = textfieldTerm.getText();
+	    	    prevSubject = textfieldSubject.getText();
+	    	}
+	    	textAreaConsole.setText("");
+	    	v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
     	}
-    	textAreaConsole.setText("");
-    	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
-    	
+    	else {
+    		textAreaConsole.setText("");
+	    	v = new ArrayList<Course>(allCourses);
+    	}
     	// Check for 404 page not found
     	if (!v.isEmpty()) {
         	String error = errorCheck(v.get(0).getTitle());
@@ -538,47 +551,90 @@ public class Controller {
      */
     @FXML
     protected void initializeCourseSet() {
-    	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
-    	
-    	// Check for 404 page not found
-    	if(!v.isEmpty()) {
-        	String error = errorCheck(v.get(0).getTitle());
-        	if (error != "No error") {
-        		textAreaConsole.setText(error);
-        		return;
+    	if(!filterAllSubjects) {
+    		List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    		// Check for 404 page not found
+        	if(!v.isEmpty()) {
+            	String error = errorCheck(v.get(0).getTitle());
+            	if (error != "No error") {
+            		textAreaConsole.setText(error);
+            		return;
+            	}
+        	}
+
+        	
+        	list.clear();
+        	int id = 0;
+        	for(int i = 0; i < v.size(); i++) {
+        		String[] courseInfo = v.get(i).getTitle().split("-", 2);
+        		String courseCode = courseInfo[0];
+        		String name = courseInfo[1].substring(0, courseInfo[1].indexOf('(')-1);
+        		
+        		String prevSection = "";
+        		for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+        			String section = v.get(i).getSection(j).getCode();
+        			if(prevSection.equals(section)) {
+        				list.add(list.get(list.size()-1));
+        				continue;
+        			}
+        			String instructor = "";
+        			int k = 0;
+        			while(k < v.get(i).getSlot(j).getInstNum()-1)
+        				instructor += (v.get(i).getSlot(j).getInstructor(k++)+" / ");
+        			instructor += v.get(i).getSlot(j).getInstructor(k);
+        			CheckBox ch = new CheckBox();
+        			ch.setOnAction(event -> {
+        				enrollSection();
+        				updateTimetable();
+        			});
+        			ch.setId("enroll"+ String.valueOf(id++));
+        			courseData temp = new courseData(courseCode, section, name, instructor, ch);
+        			list.add(temp);
+        			prevSection = section;
+        		}
         	}
     	}
+    	else {
+    		List<Course> v = new ArrayList<Course>(allCourses);
+    		if(!v.isEmpty()) {
+            	String error = errorCheck(v.get(0).getTitle());
+            	if (error != "No error") {
+            		textAreaConsole.setText(error);
+            		return;
+            	}
+        	}
 
-    	
-    	list.clear();
-    	int id = 0;
-    	for(int i = 0; i < v.size(); i++) {
-    		String[] courseInfo = v.get(i).getTitle().split("-", 2);
-    		String courseCode = courseInfo[0];
-    		String name = courseInfo[1].substring(0, courseInfo[1].indexOf('(')-1);
-    		
-    		String prevSection = "";
-    		for(int j = 0; j < v.get(i).getNumSlots(); j++) {
-    			String section = v.get(i).getSection(j).getCode();
-    			if(prevSection.equals(section)) {
-    				list.add(list.get(list.size()-1));
-    				continue;
-    			}
-    			String instructor = "";
-    			int k = 0;
-    			while(k < v.get(i).getSlot(j).getInstNum()-1)
-    				instructor += (v.get(i).getSlot(j).getInstructor(k++)+" / ");
-    			instructor += v.get(i).getSlot(j).getInstructor(k);
-    			CheckBox ch = new CheckBox();
-    			ch.setOnAction(event -> {
-    				enrollSection();
-    				updateTimetable();
-    			});
-    			ch.setId("enroll"+ String.valueOf(id++));
-    			courseData temp = new courseData(courseCode, section, name, instructor, ch);
-    			list.add(temp);
-    			prevSection = section;
-    		}
+        	
+        	list.clear();
+        	int id = 0;
+        	for(int i = 0; i < v.size(); i++) {
+        		String[] courseInfo = v.get(i).getTitle().split("-", 2);
+        		String courseCode = courseInfo[0];
+        		String name = courseInfo[1].substring(0, courseInfo[1].indexOf('(')-1);
+        		
+        		String prevSection = "";
+        		for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+        			String section = v.get(i).getSection(j).getCode();
+        			if(prevSection.equals(section)) {
+        				listAll.add(listAll.get(listAll.size()-1));
+        				continue;
+        			}
+        			String instructor = "";
+        			int k = 0;
+        			while(k < v.get(i).getSlot(j).getInstNum()-1)
+        				instructor += (v.get(i).getSlot(j).getInstructor(k++)+" / ");
+        			instructor += v.get(i).getSlot(j).getInstructor(k);
+        			CheckBox ch = new CheckBox();
+        			ch.setOnAction(event -> {
+        				enrollSection();
+        				updateTimetable();
+        			});
+        			ch.setId("enroll"+ String.valueOf(id++));
+        			courseData temp = new courseData(courseCode, section, name, instructor, ch);
+        			listAll.add(temp);
+        			prevSection = section;
+        		}
+        	}
     	}
     }
     
@@ -590,14 +646,27 @@ public class Controller {
     	textAreaConsole.clear();
     	String output = "The following sections are enrolled:\n";
     	String prevSection = "", prevCourseCode = "";
-    	for(int i = 0; i < list.size(); i++) {
-    		if(list.get(i).getEnroll().isSelected()) {
-    			if(prevSection.equals(list.get(i).getSection()) && prevCourseCode.equals(list.get(i).getCourseCode()))
-    				continue;
-    			output += list.get(i).getCourseCode()+" - "+list.get(i).getSection()+" - "+list.get(i).getName()+" - "+list.get(i).getInstructor()+"\n";
-    			prevSection = list.get(i).getSection();
-    			prevCourseCode = list.get(i).getCourseCode();
-    		}
+    	if(!filterAllSubjects) {
+	    	for(int i = 0; i < list.size(); i++) {
+	    		if(list.get(i).getEnroll().isSelected()) {
+	    			if(prevSection.equals(list.get(i).getSection()) && prevCourseCode.equals(list.get(i).getCourseCode()))
+	    				continue;
+	    			output += list.get(i).getCourseCode()+" - "+list.get(i).getSection()+" - "+list.get(i).getName()+" - "+list.get(i).getInstructor()+"\n";
+	    			prevSection = list.get(i).getSection();
+	    			prevCourseCode = list.get(i).getCourseCode();
+	    		}
+	    	}
+    	}
+    	else {
+    		for(int i = 0; i < listAll.size(); i++) {
+	    		if(listAll.get(i).getEnroll().isSelected()) {
+	    			if(prevSection.equals(listAll.get(i).getSection()) && prevCourseCode.equals(listAll.get(i).getCourseCode()))
+	    				continue;
+	    			output += listAll.get(i).getCourseCode()+" - "+listAll.get(i).getSection()+" - "+listAll.get(i).getName()+" - "+listAll.get(i).getInstructor()+"\n";
+	    			prevSection = listAll.get(i).getSection();
+	    			prevCourseCode = listAll.get(i).getCourseCode();
+	    		}
+	    	}
     	}
     	textAreaConsole.setText(output);
     }
@@ -607,59 +676,114 @@ public class Controller {
      * @param v list of courses from the filtering search
      */
     protected void listFilteredCourses(List<Course> v) {
+    	// Need to separate for search and allsearch
     	listForPrint.clear();
     	int indexV = 0;
     	int indexSection = 0;
     	String prevSection = "";
-    	for(int i = 0; i < list.size(); i++) {
-    		if(indexV >= v.size())
-    			break;
-    		if(v.get(indexV).getNumSlots() == 0) {
-    			indexV++;
-    			i--;
-    			continue;
-    		}
-    		
-    		// get slot info in v
-    		String[] courseInfo = v.get(indexV).getTitle().split("-", 2);
-    		String courseCodeV = courseInfo[0];
-    		
-    		if(listForPrint.size() != 0 
-    				&& (listForPrint.get(listForPrint.size()-1).getSection().equals(v.get(indexV).getSection(indexSection).getCode())
-    				&& listForPrint.get(listForPrint.size()-1).getCourseCode().equals(courseCodeV))) {
-    			if(indexSection >= v.get(indexV).getNumSlots()-1) {
-	    			indexSection = 0;
+    	if(!filterAllSubjects) {
+	    	for(int i = 0; i < list.size(); i++) {
+	    		if(indexV >= v.size())
+	    			break;
+	    		if(v.get(indexV).getNumSlots() == 0) {
 	    			indexV++;
+	    			i--;
+	    			continue;
 	    		}
-	    		else
-	    			indexSection++;
-    			continue;
-    		}
-    			
-    		if(prevSection.equals(list.get(i).getSection())
-    				&& listForPrint.get(listForPrint.size()-1).getCourseCode().equals(list.get(i).getCourseCode()))
-    			continue;
-    		
-    		
-    		String nameV = v.get(indexV).getSection(indexSection).getCode();
-    		// Add slots that are in result of filtering only
-    		
-        	/*textAreaConsole.setText(textAreaConsole.getText()
-        			+courseCodeV+"\t"+nameV+"\t"
-        			+list.get(i).getCourseCode()+"\t"+list.get(i).getSection()+"\t"
-        			+courseCodeV.equals(list.get(i).getCourseCode())+"\t"
-        			+nameV.equals(list.get(i).getSection())
-        			+"\n");*/
-    		if(courseCodeV.equals(list.get(i).getCourseCode()) && nameV.equals(list.get(i).getSection())) {
-	    		listForPrint.add(list.get(i));
-	    		prevSection = list.get(i).getSection();
-	    		if(indexSection >= v.get(indexV).getNumSlots()-1) {
-	    			indexSection = 0;
+	    		
+	    		// get slot info in v
+	    		String[] courseInfo = v.get(indexV).getTitle().split("-", 2);
+	    		String courseCodeV = courseInfo[0];
+	    		
+	    		if(listForPrint.size() != 0 
+	    				&& (listForPrint.get(listForPrint.size()-1).getSection().equals(v.get(indexV).getSection(indexSection).getCode())
+	    				&& listForPrint.get(listForPrint.size()-1).getCourseCode().equals(courseCodeV))) {
+	    			if(indexSection >= v.get(indexV).getNumSlots()-1) {
+		    			indexSection = 0;
+		    			indexV++;
+		    		}
+		    		else
+		    			indexSection++;
+	    			continue;
+	    		}
+	    			
+	    		if(prevSection.equals(list.get(i).getSection())
+	    				&& listForPrint.get(listForPrint.size()-1).getCourseCode().equals(list.get(i).getCourseCode()))
+	    			continue;
+	    		
+	    		
+	    		String nameV = v.get(indexV).getSection(indexSection).getCode();
+	    		// Add slots that are in result of filtering only
+	    		
+	        	/*textAreaConsole.setText(textAreaConsole.getText()
+	        			+courseCodeV+"\t"+nameV+"\t"
+	        			+list.get(i).getCourseCode()+"\t"+list.get(i).getSection()+"\t"
+	        			+courseCodeV.equals(list.get(i).getCourseCode())+"\t"
+	        			+nameV.equals(list.get(i).getSection())
+	        			+"\n");*/
+	    		if(courseCodeV.equals(list.get(i).getCourseCode()) && nameV.equals(list.get(i).getSection())) {
+		    		listForPrint.add(list.get(i));
+		    		prevSection = list.get(i).getSection();
+		    		if(indexSection >= v.get(indexV).getNumSlots()-1) {
+		    			indexSection = 0;
+		    			indexV++;
+		    		}
+		    		else
+		    			indexSection++;
+	    		}
+	    	}
+    	}
+    	else {
+    		for(int i = 0; i < listAll.size(); i++) {
+	    		if(indexV >= v.size())
+	    			break;
+	    		if(v.get(indexV).getNumSlots() == 0) {
 	    			indexV++;
+	    			i--;
+	    			continue;
 	    		}
-	    		else
-	    			indexSection++;
-    		}
+	    		
+	    		// get slot info in v
+	    		String[] courseInfo = v.get(indexV).getTitle().split("-", 2);
+	    		String courseCodeV = courseInfo[0];
+	    		
+	    		if(listForPrint.size() != 0 
+	    				&& (listForPrint.get(listForPrint.size()-1).getSection().equals(v.get(indexV).getSection(indexSection).getCode())
+	    				&& listForPrint.get(listForPrint.size()-1).getCourseCode().equals(courseCodeV))) {
+	    			if(indexSection >= v.get(indexV).getNumSlots()-1) {
+		    			indexSection = 0;
+		    			indexV++;
+		    		}
+		    		else
+		    			indexSection++;
+	    			continue;
+	    		}
+	    			
+	    		if(prevSection.equals(listAll.get(i).getSection())
+	    				&& listForPrint.get(listForPrint.size()-1).getCourseCode().equals(listAll.get(i).getCourseCode()))
+	    			continue;
+	    		
+	    		
+	    		String nameV = v.get(indexV).getSection(indexSection).getCode();
+	    		// Add slots that are in result of filtering only
+	    		
+	        	/*textAreaConsole.setText(textAreaConsole.getText()
+	        			+courseCodeV+"\t"+nameV+"\t"
+	        			+list.get(i).getCourseCode()+"\t"+list.get(i).getSection()+"\t"
+	        			+courseCodeV.equals(list.get(i).getCourseCode())+"\t"
+	        			+nameV.equals(list.get(i).getSection())
+	        			+"\n");*/
+	    		if(courseCodeV.equals(listAll.get(i).getCourseCode()) && nameV.equals(listAll.get(i).getSection())) {
+		    		listForPrint.add(listAll.get(i));
+		    		prevSection = listAll.get(i).getSection();
+		    		if(indexSection >= v.get(indexV).getNumSlots()-1) {
+		    			indexSection = 0;
+		    			indexV++;
+		    		}
+		    		else
+		    			indexSection++;
+	    		}
+	    	}
     	}
     	
     	courseTable.setItems(listForPrint);
@@ -772,56 +896,61 @@ public class Controller {
     	List<Course> temp = new Vector<Course>();
     	String []sub= {"ACCT", "AESF", "BIBU","BIEN","BIPH","BTEC", "CBME", "CENG", "CHEM","CHMS", "CIEM", "CIVL", "COMP","CSIC", "CSIT", "ECON", "EEMT", "EESM","ELEC","EMBA","ENEG","ENGG", "ENTR", "ENVR", "ENVS", "EVNG","EVSM", "FINA","GBUS","GFIN","GNED", "HART", "HHMS", "HLTH","HMMA","HUMA", "IBTM","IDPO","IEDA","IIMP","IMBA", "ISDN", "ISOM", "JEVE","LABU","LANG", "LIFS", "MAED", "MAFS", "MARK", "MATH", "MECH","MESF","MFIT", "MGCS", "MGMT","MILE", "MIMT", "MSBD","MSDM","NANO", "OCES","PDEV", "PHYS","PPOL","RMBI", "SBMT","SCIE","SHSS", "SOSC","SSMA","SUST","TEMG", "UROP","WBBA"};
     	for(int i=0;i<sub.length;i++)
-    	{textfieldSubject.setText(sub[i]);
-    	temp.clear();
-    	temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
-    	subcount+=temp.size();
-    	for(int j=0;j<temp.size();j++)
     	{
-    		if (temp.get(j).getTitle().equals("404error"))continue;
-    	
-    	v.add(temp.get(j));
+    		textfieldSubject.setText(sub[i]);
+    		temp.clear();
+    		temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    		subcount+=temp.size();
+    		for(int j=0;j<temp.size();j++)
+    		{
+    			if (temp.get(j).getTitle().equals("404error"))
+    				continue;
+    			
+    			v.add(temp.get(j));
+    		}
     	
     	}
     	
-    	}
-    	
-        // Check for 404 page not found
+    		// Check for 404 page not found
     	if (v.isEmpty()) {
     		textAreaConsole.setText("404 page not found. Check if the URL is correct.");
     		return;
     	}
     	if (!v.isEmpty()) {
-        	String error = errorCheck(v.get(0).getTitle());
-        	if (error != "No error") {
-        		textAreaConsole.setText(error);
-        		return;
-        	}
+    		String error = errorCheck(v.get(0).getTitle());
+    		if (error != "No error") {
+    			textAreaConsole.setText(error);
+    			return;
+    		}
     	}
-        		if(click)
-        			{textAreaConsole.setText("Total Number of Categories/Code Prefix: " + subcount);
-        			double progress=0.0f;
-        			progressbar.setProgress(progress);
-        			
-        			}
+       	if(click)
+        {
+        	textAreaConsole.setText("Total Number of Categories/Code Prefix: " + subcount);
+        	double progress=0.0f;
+        	progressbar.setProgress(progress);
+       	}
        
-        		if(!click && v.size()!=0)
-        		{
-        			double progress=0.0f;
-        		for(int i=0;i<v.size();i++) {
+        if(!click && v.size()!=0)
+        {
+        	double progress=0.0f;
+        	for(int i=0;i<v.size();i++) {
 
-        		    	System.out.println(v.get(i).getTitle() + " is done");
-        		    	progress=(float)i/v.size() ;
+        	   	System.out.println(v.get(i).getTitle() + " is done");
+        		progress=(float)i/v.size() ;
 
-        		    	progressbar.setProgress(progress);
+        		progressbar.setProgress(progress);
         		    	
-        		    	String[] courseInfo = v.get(i).getTitle().split("-", 2);
-    					String code=courseInfo[0];
-        		    	if(code!="")count++;
-        		    }
-        		textAreaConsole.setText("Total Number of Courses fetched: " + count);
-        		
-        		}
+        		String[] courseInfo = v.get(i).getTitle().split("-", 2);
+        		String code=courseInfo[0];
+        		if(code!="")count++;
+        	}
+        	textAreaConsole.setText("Total Number of Courses fetched: " + count);
+        	
+        	// Indicator for filterSearch()
+        	filterAllSubjects = true;
+        	allCourses = v;
+        	initializeCourseSet();
+        }
     	
     }
 
@@ -925,6 +1054,9 @@ public class Controller {
     	DISABLED = false;
     	buttonSfqEnrollCourse.setDisable(DISABLED);
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	// indicator for filterSearch()
+    	filterAllSubjects = false;
+    	initializeCourseSet();
     	
     	// Check for 404 page not found
     	if (!v.isEmpty()) {
