@@ -485,4 +485,45 @@ public class Task_2_3_Test extends ApplicationTest {
 		assertFalse(output.contains(list.get(0).getCourseCode()));
 		assertTrue(output.contains(list.get(2).getCourseCode()));
 	}
+	
+	@Test
+	public void testInitializeCourseSet_allSub() {
+		clickOn("#tabFilter");
+		clickOn("#checkAM");
+		clickOn("#tabAllSubject");
+		clickOn("#allSubjectSearch");
+		clickOn("#allSubjectSearch");
+		clickOn("#tabFilter");
+		clickOn("#checkAM");
+		TableView<courseData> courseTable = (TableView<courseData>)m.get("courseTable");
+		ObservableList<courseData> list = courseTable.getItems();
+		assertTrue(list.get(0).getCourseCode().contains("AESF"));
+		assertTrue(list.get(5).getCourseCode().contains("BIBU"));
+		assertTrue(list.get(6).getCourseCode().contains("BIEN"));
+	}
+	
+	@Test
+	public void testEnrollmentOutput_allSub() {
+		clickOn("#tabAllSubject");
+		clickOn("#allSubjectSearch");
+		clickOn("#allSubjectSearch");
+		
+		clickOn("#tabFilter");
+		clickOn("#checkAM");
+		clickOn("#checkAM");
+		
+		clickOn("#tabList");
+		TableView<courseData> courseTable = (TableView<courseData>)m.get("courseTable");
+		ObservableList<courseData> list = courseTable.getItems();
+		
+		clickOn("#enroll0");
+		clickOn("#enroll2");
+		sleep(1000);
+		
+		TextArea textAreaConsole = (TextArea)s.lookup("#textAreaConsole");
+		
+		String output = textAreaConsole.getText();
+		assertTrue(output.contains(list.get(0).getCourseCode()));
+		assertTrue(output.contains(list.get(2).getCourseCode()));
+	}
 }
