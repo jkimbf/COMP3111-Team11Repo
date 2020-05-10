@@ -34,13 +34,19 @@ public class Task_1_and_6 extends ApplicationTest {
 	
 	// Task 1
 	
+	/**
+	 * Test if a section ID can be set
+	 */
 	@Test
 	public void testSectionID() {
 		Section s = new Section();
 		s.setID("sampleID");
 		assertEquals(s.getID(), "sampleID");
 	}
-	
+
+	/**
+	 * Test if a section code can be set
+	 */
 	@Test
 	public void testSectionCode() {
 		Section s = new Section();
@@ -48,6 +54,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(s.getCode(), "sampleCode");
 	}
 	
+	/**
+	 * Test if the Section.toString function works
+	 */
 	@Test
 	public void testSectionToString() {
 		Section s = new Section();
@@ -56,6 +65,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(s.toString(), "sampleCode sampleID");
 	}
 	
+	/**
+	 * Test if the Section can clone itself
+	 */
 	@Test
 	public void testSectionClone() {
 		Section s = new Section();
@@ -65,6 +77,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(s.toString(), x.toString());
 	}
 	
+	/**
+	 * Test if a section can be added to a course
+	 */
 	@Test
 	public void testCourseAddSection1() {
 		Course c = new Course();
@@ -74,6 +89,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(c.getSection(0).getCode(), s.getCode());
 	}
 	
+	/**
+	 * Test if a course can have maximum 40 sections
+	 */
 	@Test
 	public void testCourseAddSection2() {
 		Course c = new Course();
@@ -86,6 +104,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(c.getNumSections(), 40);
 	}
 	
+	/**
+	 * Test if incrementing and decrementing section number works
+	 */
 	@Test
 	public void testCourseSetSectionNumber() {
 		Course c = new Course();
@@ -98,6 +119,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(c.getNumSections(), 2);
 	}
 	
+	/**
+	 * Test getting sections for different indexes
+	 */
 	@Test
 	public void testCourseGetSection() {
 		Course c = new Course();
@@ -111,6 +135,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertNotEquals(c.getSection(0).getID(), c.getSection(1).getID());
 	}
 	
+	/**
+	 * Test if setting course overall mean works
+	 */
 	@Test
 	public void testCourseOverallMean() {
 		Course c = new Course();
@@ -119,6 +146,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(c.getCourseOverallMean(), "100");
 	}
 	
+	/**
+	 * Test if setting instructor overall mean works
+	 */
 	@Test
 	public void testCourseInstructorOverallMean() {
 		Course c = new Course();
@@ -127,6 +157,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(c.getInstructorOverallMean(), "100");
 	}
 	
+	/**
+	 * Test if setting response rate works
+	 */
 	@Test
 	public void testCourseResponseRate() {
 		Course c = new Course();
@@ -138,6 +171,9 @@ public class Task_1_and_6 extends ApplicationTest {
 	
 	// Task 2
 	
+	/**
+	 * Test if a SFQinstructor object can be constructed correctly
+	 */
 	@Test
 	public void testSFQinstructorConstructor() {
 		SFQinstructor inst = new SFQinstructor("Junyeol");
@@ -145,6 +181,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(inst.getName(), "Junyeol");
 	}
 	
+	/**
+	 * Test if a course overall mean can be added
+	 */
 	@Test
 	public void testSFQinstructorCourseOverallMean1() {
 		SFQinstructor inst = new SFQinstructor("Junyeol");
@@ -153,6 +192,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(inst.getCourseOverallMean(), "31.6");
 	}
 	
+	/**
+	 * Test if a course overall mean can be added
+	 */
 	@Test
 	public void testSFQinstructorCourseOverallMean2() {
 		SFQinstructor inst = new SFQinstructor("Junyeol");
@@ -161,6 +203,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(inst.getCourseOverallMean(), "1.6");
 	}
 	
+	/**
+	 * Test if it prints a dash if it does not have any course overall mean value
+	 */
 	@Test
 	public void testSFQinstructorCourseOverallMean3() {
 		SFQinstructor inst = new SFQinstructor("Junyeol");
@@ -168,6 +213,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(inst.getCourseOverallMean(), "-");
 	}
 	
+	/**
+	 * Test if the instructor overall mean can be added
+	 */
 	@Test
 	public void testSFQinstructorOverallMean() {
 		SFQinstructor inst = new SFQinstructor("Junyeol");
@@ -176,6 +224,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(inst.getInstructorOverallMean(), "31.6");
 	}
 	
+	/**
+	 * Test if the instructor overall mean can be added
+	 */
 	@Test
 	public void testSFQinstructorOverallMean2() {
 		SFQinstructor inst = new SFQinstructor("Junyeol");
@@ -184,6 +235,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(inst.getInstructorOverallMean(), "1.6");
 	}
 	
+	/**
+	 * Test if it prints a dash if it does not have any instructor overall mean value
+	 */
 	@Test
 	public void testSFQinstructorOverallMean3() {
 		SFQinstructor inst = new SFQinstructor("Junyeol");
@@ -191,6 +245,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(inst.getInstructorOverallMean(), "-");
 	}
 	
+	/**
+	 * Test if the response rate can be added
+	 */
 	@Test
 	public void testSFQinstructorResponseRate() {
 		SFQinstructor inst = new SFQinstructor("Junyeol");
@@ -199,6 +256,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(inst.getResponseRate(), "31.6");
 	}
 	
+	/**
+	 * Test if the response rate can be added
+	 */
 	@Test
 	public void testSFQinstructorResponseRate2() {
 		SFQinstructor inst = new SFQinstructor("Junyeol");
@@ -207,6 +267,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(inst.getResponseRate(), "1.6");
 	}
 	
+	/**
+	 * Test if it prints a dash if it does not have any course overall mean value
+	 */
 	@Test
 	public void testSFQinstructorResponseRate3() {
 		SFQinstructor inst = new SFQinstructor("Junyeol");
@@ -214,6 +277,9 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertEquals(inst.getResponseRate(), "-");
 	}
 	
+	/**
+	 * Test if the buttonSfqEnrollCourse is not disabled after the Search button is clicked
+	 */
 	@Test
 	public void testScrapeSFQ() {
 		clickOn("#buttonSearch");
@@ -226,12 +292,14 @@ public class Task_1_and_6 extends ApplicationTest {
 		assertFalse(b.isDisabled());
 	}
 	
+	/**
+	 * Test if the console does not print 404 page not found for the correct URL
+	 */
 	@Test
 	public void testScrapeSFQinstructors() {
 		clickOn("#tabSfq");
 		clickOn("#buttonInstructorSfq");
 		
-		Button b = (Button)s.lookup("#buttonSfqEnrollCourse");
 		TextArea textAreaConsole = (TextArea)s.lookup("#textAreaConsole");
 		String output = textAreaConsole.getText();
 		
