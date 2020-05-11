@@ -260,7 +260,35 @@ public class Controller {
         		return;
         	}
     	}
-
+    	
+    	// With Labs or Tutorial
+    	if(checkLAT.isSelected()) {
+    		for(int i = 0; i < v.size(); i++) {
+    			Course temp = new Course();
+    			temp.setTitle(v.get(i).getTitle());
+    			temp.setDescription(v.get(i).getDescription());
+    			temp.setExclusion(v.get(i).getExclusion());
+    			temp.setCC4Y(v.get(i).getCC4Y());
+    			
+    			boolean containsLAT = false;
+    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+    				if(v.get(i).getSection(j).getCode().contains("LA")
+    						|| v.get(i).getSection(j).getCode().charAt(0) == 'T') {
+    					containsLAT = true;
+    				}
+    			}
+    			
+    			
+	    		for(int j = 0; j < v.get(i).getNumSlots(); j++) {
+	    			if(containsLAT) {	
+	    				temp.addSlot(v.get(i).getSlot(j));
+	    				temp.addSection(v.get(i).getSection(j));
+	    			}
+    			}
+    			v.remove(i);
+    			v.add(i, temp);
+    		}
+    	}
     	
     	// Days
     	if(checkMon.isSelected() || checkTue.isSelected() || checkWed.isSelected() 
@@ -311,8 +339,8 @@ public class Controller {
 	        		if(intSat == 1) { buttonNums[i] = 5; intSat-=1; continue; }
     			}
     			
-    			String prevCode = "";
     			for(int i = 0; i < v.size(); i++) {
+    				String prevCode = "";
 					Course temp = new Course();
 	    			temp.setTitle(v.get(i).getTitle());
 	    			temp.setDescription(v.get(i).getDescription());
@@ -496,36 +524,6 @@ public class Controller {
     		}
     	}
     	
-    	
-    	// With Labs or Tutorial
-    	if(checkLAT.isSelected()) {
-    		for(int i = 0; i < v.size(); i++) {
-    			Course temp = new Course();
-    			temp.setTitle(v.get(i).getTitle());
-    			temp.setDescription(v.get(i).getDescription());
-    			temp.setExclusion(v.get(i).getExclusion());
-    			temp.setCC4Y(v.get(i).getCC4Y());
-    			
-    			boolean containsLAT = false;
-    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
-    				if(v.get(i).getSection(j).getCode().contains("LA")
-    						|| v.get(i).getSection(j).getCode().charAt(0) == 'T') {
-    					containsLAT = true;
-    				}
-    			}
-    			
-    			if(containsLAT) {
-	    			for(int j = 0; j < v.get(i).getNumSlots(); j++) {
-	    				temp.addSlot(v.get(i).getSlot(j));
-						temp.addSection(v.get(i).getSection(j));
-	    			}
-    			}
-    			v.remove(i);
-    			v.add(i, temp);
-    		}
-    	}
-    	
-    	
     	for (Course c : v) {
     		String newline = "";
     		
@@ -605,7 +603,7 @@ public class Controller {
         	}
 
         	
-        	list.clear();
+        	listAll.clear();
         	int id = 0;
         	for(int i = 0; i < v.size(); i++) {
         		String[] courseInfo = v.get(i).getTitle().split("-", 2);
