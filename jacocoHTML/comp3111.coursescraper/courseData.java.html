@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>courseData.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">COMP3111-Team11Repo</a> &gt; <a href="index.source.html" class="el_package">comp3111.coursescraper</a> &gt; <span class="el_source">courseData.java</span></div><h1>courseData.java</h1><pre class="source lang-java linenums">package comp3111.coursescraper;
+
+import java.util.List;
+
+import javafx.scene.control.CheckBox;
+
+/**
+ * A class for the each raw of the TableView in the List tab
+ * 
+ * @author KIM, Jaehyeok
+ * 
+ */
+public class courseData {
+	/**
+	 * Course Code of the course
+	 * 
+	 * @see #getCourseCode()
+	 * @see #setCourseCode(String)
+	 */
+	private String courseCode;
+	
+	/**
+	 * Section of the data
+	 * 
+	 * @see #getSection()
+	 * @see #setSection(String)
+	 */
+	private String section;
+	
+	/**
+	 * Title of the course
+	 * 
+	 * @see #getName()
+	 * @see #setName(String)
+	 */
+	private String name;
+	
+	/**
+	 * Instructor name of the course
+	 * 
+	 * @see #getInstructor()
+	 * @see #setInstructor(String)
+	 */
+	private String instructor;
+	
+	/**
+	 * Enrollment status of the section
+	 * 
+	 * @see #getEnroll()
+	 * @see #setEnroll(CheckBox)
+	 */
+	private CheckBox enroll;
+	
+	/**
+	 * Constructor with no arguments
+	 */
+<span class="fc" id="L57">	public courseData() {</span>
+		
+<span class="fc" id="L59">	}</span>
+	
+	/**
+	 * Constructor with arguments for fields
+	 * 
+	 * @param courseCode the code of course
+	 * @param section the section of the data
+	 * @param name the title of the course
+	 * @param instructor the instructor of the course
+	 * @param enroll enrollment status
+	 */
+<span class="fc" id="L70">	public courseData(String courseCode, String section, String name, String instructor, CheckBox enroll) {</span>
+<span class="fc" id="L71">		this.courseCode = courseCode;</span>
+<span class="fc" id="L72">		this.section = section;</span>
+<span class="fc" id="L73">		this.name = name;</span>
+<span class="fc" id="L74">		this.instructor = instructor;</span>
+<span class="fc" id="L75">		this.enroll = enroll;</span>
+<span class="fc" id="L76">	}</span>
+	
+	/**
+	 * @return the course code
+	 */
+	public String getCourseCode() {
+<span class="fc" id="L82">		return courseCode;</span>
+	}
+	
+	/**
+	 * @param courseCode the course code to set
+	 */
+	public void setCourseCode(String courseCode) {
+<span class="fc" id="L89">		this.courseCode = courseCode;</span>
+<span class="fc" id="L90">	}</span>
+	
+	/**
+	 * @return the section
+	 */
+	public String getSection() {
+<span class="fc" id="L96">		return section;</span>
+	}
+	
+	/**
+	 * @param section the section to set
+	 */
+	public void setSection(String section) {
+<span class="fc" id="L103">		this.section = section;</span>
+<span class="fc" id="L104">	}</span>
+	
+	/**
+	 * @return the title of the course
+	 */
+	public String getName() {
+<span class="fc" id="L110">		return name;</span>
+	}
+	
+	/**
+	 * @param name the title to set
+	 */
+	public void setName(String name) {
+<span class="fc" id="L117">		this.name = name;</span>
+<span class="fc" id="L118">	}</span>
+	
+	/**
+	 * @return the instructor name of the section
+	 */
+	public String getInstructor() {
+<span class="fc" id="L124">		return instructor;</span>
+	}
+	
+	/**
+	 * @param instructor the instructor name to set
+	 */
+	public void setInstructor(String instructor) {
+<span class="fc" id="L131">		this.instructor = instructor;</span>
+<span class="fc" id="L132">	}</span>
+	
+	/**
+	 * @return the CheckBox for enrollment status
+	 */
+	public CheckBox getEnroll() {
+<span class="fc" id="L138">		return enroll;</span>
+	}
+	
+	/**
+	 * @param enroll the CheckBox(enrollment status) to set
+	 */
+	public void setEnroll(CheckBox enroll) {
+<span class="fc" id="L145">		this.enroll = enroll;</span>
+<span class="fc" id="L146">	}</span>
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
