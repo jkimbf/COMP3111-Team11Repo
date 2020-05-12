@@ -1067,6 +1067,9 @@ public class Controller {
     	}    	
     }
     
+    /**
+     * Updating enrollment status from all subjects list to single subject list
+     */
     protected void allToSingle() {
     	// list: single scraped courses
     	// listAll: all scraped courses
