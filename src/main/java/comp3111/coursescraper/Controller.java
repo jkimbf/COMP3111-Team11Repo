@@ -162,6 +162,8 @@ public class Controller {
     private String prevSubject;
     
     private boolean filterAllSubjects = false;
+    
+    private boolean allInitialized = false;
 
     private boolean click=false; //detect in Allsubjectsearch
     
@@ -241,6 +243,8 @@ public class Controller {
     	if(!filterAllSubjects) {
 	    	if(!prevURL.equals(textfieldURL.getText()) || !prevTerm.equals(textfieldTerm.getText()) || !prevSubject.equals(textfieldSubject.getText())) {
 	    		initializeCourseSet();
+	    		if(allInitialized)
+	        		allToSingle();
 	    		prevURL = textfieldURL.getText();
 	    	    prevTerm = textfieldTerm.getText();
 	    	    prevSubject = textfieldSubject.getText();
@@ -946,10 +950,36 @@ public class Controller {
         	
         	// Indicator for filterSearch()
         	filterAllSubjects = true;
+        	allInitialized = true;
         	allCourses = v;
         	initializeCourseSet();
+        	singleToAll();
         }
     	
+    }
+    
+    /**
+     * Enrollment status update from single subject search to All subjects
+     */
+    protected void singleToAll() {
+    	// list: single scraped courses
+    	// listAll: all scraped courses
+    	
+    	for(int i = 0; i < list.size(); i++) {
+    		// if one course is selected
+    		if(list.get(i).getEnroll().isSelected()) {
+    			// Traverse all list
+    			for(int j = 0; j < listAll.size(); j++) {
+        			if(list.get(i).getCourseCode().equals(listAll.get(j).getCourseCode()) 
+        					&& list.get(i).getSection().equals(listAll.get(j).getSection())) {
+        				CheckBox temp = listAll.get(j).getEnroll();
+        				temp.setSelected(true);
+        				listAll.get(j).setEnroll(temp);
+        			}
+        		}
+    		}
+    		
+    	}
     }
 
 	/**
@@ -1037,7 +1067,26 @@ public class Controller {
     	}    	
     }
     
-
+    protected void allToSingle() {
+    	// list: single scraped courses
+    	// listAll: all scraped courses
+    	
+    	for(int i = 0; i < listAll.size(); i++) {
+    		// if one course is selected
+    		if(listAll.get(i).getEnroll().isSelected()) {
+    			// Traverse all list
+    			for(int j = 0; j < list.size(); j++) {
+        			if(listAll.get(i).getCourseCode().equals(list.get(j).getCourseCode()) 
+        					&& listAll.get(i).getSection().equals(list.get(j).getSection())) {
+        				CheckBox temp = list.get(j).getEnroll();
+        				temp.setSelected(true);
+        				list.get(j).setEnroll(temp);
+        			}
+        		}
+    		}
+    	}
+    }
+    
 	/**
 	 * Scrape and print data for each course
 	 * <p>
@@ -1055,6 +1104,8 @@ public class Controller {
     	// indicator for filterSearch()
     	filterAllSubjects = false;
     	initializeCourseSet();
+    	if(allInitialized)
+    		allToSingle();
     	
     	// Check for 404 page not found
     	if (!v.isEmpty()) {

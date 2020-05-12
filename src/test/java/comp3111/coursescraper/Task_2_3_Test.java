@@ -526,4 +526,49 @@ public class Task_2_3_Test extends ApplicationTest {
 		assertTrue(output.contains(list.get(0).getCourseCode()));
 		assertTrue(output.contains(list.get(2).getCourseCode()));
 	}
+	
+	@Test
+	public void testEnrollmentPersistencyToAllSubjectSearch() {
+		clickOn("#tabFilter");
+		clickOn("#checkLAT");
+		clickOn("#tabList");
+		clickOn("#enroll0");
+		clickOn("#enroll2");
+		clickOn("#tabAllSubject");
+		clickOn("#allSubjectSearch");
+		clickOn("#allSubjectSearch");
+		clickOn("#tabList");
+		clickOn("#enroll0");
+		
+		sleep(10000);
+		TextArea textAreaConsole = (TextArea)s.lookup("#textAreaConsole");
+		String output = textAreaConsole.getText();
+		
+		assertTrue(output.contains("COMP 1001"));
+		assertTrue(output.contains("COMP 1021"));
+	}
+	
+	@Test
+	public void testSingleToAll() {
+		clickOn("#tabFilter");
+		clickOn("#checkLAT");
+		clickOn("#tabList");
+		clickOn("#enroll0");
+		clickOn("#enroll2");
+		clickOn("#tabAllSubject");
+		clickOn("#allSubjectSearch");
+		clickOn("#allSubjectSearch");
+		
+		clickOn("#tabMain");
+		TextField subjectBox = (TextField)m.get("textfieldSubject");
+		subjectBox.clear();
+		subjectBox.setText("COMP");
+		clickOn("#buttonSearch");
+		
+		CheckBox box1 = (CheckBox)s.lookup("#enroll0");
+		CheckBox box2 = (CheckBox)s.lookup("#enroll2");
+		
+		assertTrue(box1.isSelected());
+		assertTrue(box2.isSelected());
+	}
 }
