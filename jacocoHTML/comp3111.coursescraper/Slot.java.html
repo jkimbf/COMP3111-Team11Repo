@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Slot.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">COMP3111-Team11Repo</a> &gt; <a href="index.source.html" class="el_package">comp3111.coursescraper</a> &gt; <span class="el_source">Slot.java</span></div><h1>Slot.java</h1><pre class="source lang-java linenums">package comp3111.coursescraper;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.time.LocalTime;
+import java.util.Locale;
+import java.time.format.DateTimeFormatter;
+
+<span class="fc" id="L9">public class Slot {</span>
+	private int day;
+	private LocalTime start;
+	private LocalTime end;
+	private String venue;
+	private String instructors[];
+	private int instNum;
+<span class="fc" id="L16">	public static final String DAYS[] = {&quot;Mo&quot;, &quot;Tu&quot;, &quot;We&quot;, &quot;Th&quot;, &quot;Fr&quot;, &quot;Sa&quot;};</span>
+<span class="fc" id="L17">	public static final Map&lt;String, Integer&gt; DAYS_MAP = new HashMap&lt;String, Integer&gt;();</span>
+	static {
+<span class="fc bfc" id="L19" title="All 2 branches covered.">		for (int i = 0; i &lt; DAYS.length; i++)</span>
+<span class="fc" id="L20">			DAYS_MAP.put(DAYS[i], i);</span>
+<span class="fc" id="L21">	}</span>
+
+	@Override
+	public Slot clone() {
+<span class="fc" id="L25">		Slot s = new Slot();</span>
+<span class="fc" id="L26">		s.instructors = this.instructors;</span>
+<span class="fc" id="L27">		s.instNum = this.instNum;</span>
+<span class="fc" id="L28">		s.day = this.day;</span>
+<span class="fc" id="L29">		s.start = this.start;</span>
+<span class="fc" id="L30">		s.end = this.end;</span>
+<span class="fc" id="L31">		s.venue = this.venue;</span>
+<span class="fc" id="L32">		return s;</span>
+	}
+	public String toString() {
+<span class="fc" id="L35">		return DAYS[day] + start.toString() + &quot;-&quot; + end.toString() + &quot;:&quot; + venue;</span>
+	}
+	public int getStartHour() {
+<span class="fc" id="L38">		return start.getHour();</span>
+	}
+	public int getStartMinute() {
+<span class="fc" id="L41">		return start.getMinute();</span>
+	}
+	public int getEndHour() {
+<span class="fc" id="L44">		return end.getHour();</span>
+	}
+	public int getEndMinute() {
+<span class="fc" id="L47">		return end.getMinute();</span>
+	}
+	/**
+	 * @return the start
+	 */
+	public LocalTime getStart() {
+<span class="fc" id="L53">		return start;</span>
+	}
+	/**
+	 * @param start the start to set
+	 */
+	public void setStart(String start) {
+<span class="fc" id="L59">		this.start = LocalTime.parse(start, DateTimeFormatter.ofPattern(&quot;hh:mma&quot;, Locale.US));</span>
+<span class="fc" id="L60">	}</span>
+	/**
+	 * @return the end
+	 */
+	public LocalTime getEnd() {
+<span class="fc" id="L65">		return end;</span>
+	}
+	/**
+	 * @param end the end to set
+	 */
+	public void setEnd(String end) {
+<span class="fc" id="L71">		this.end = LocalTime.parse(end, DateTimeFormatter.ofPattern(&quot;hh:mma&quot;, Locale.US));</span>
+<span class="fc" id="L72">	}</span>
+	/**
+	 * @return the venue
+	 */
+	public String getVenue() {
+<span class="nc" id="L77">		return venue;</span>
+	}
+	/**
+	 * @param venue the venue to set
+	 */
+	public void setVenue(String venue) {
+<span class="fc" id="L83">		this.venue = venue;</span>
+<span class="fc" id="L84">	}</span>
+
+	/**
+	 * @return the day
+	 */
+	public int getDay() {
+<span class="fc" id="L90">		return day;</span>
+	}
+	/**
+	 * @param day the day to set
+	 */
+	public void setDay(int day) {
+<span class="fc" id="L96">		this.day = day;</span>
+<span class="fc" id="L97">	}</span>
+	
+	/**
+	 * Initialize instructor array
+	 * 
+	 * @param size is the maximum number of instructors for a slot
+	 */
+	public void setInstructor(int size) {
+<span class="fc" id="L105">		instructors = new String[size];</span>
+<span class="fc" id="L106">		instNum = 0;</span>
+<span class="fc" id="L107">	}</span>
+	
+	/**
+	 * Add an instructor to the slot
+	 * 
+	 * @param x is the name of the instructor
+	 */
+	public void addInstructor(String x) {
+<span class="fc" id="L115">		instructors[instNum] = x;</span>
+<span class="fc" id="L116">		++instNum;</span>
+<span class="fc" id="L117">	}</span>
+	
+	/**
+	 * Get the instructor
+	 * 
+	 * @param 	i is the index for finding an instructor
+	 * @return	the instructor at i
+	 */
+	public String getInstructor(int i) {
+<span class="fc" id="L126">		return instructors[i];</span>
+	}
+	
+	/**
+	 * Get the number of instructors
+	 * 
+	 * @return	the number of instructors for this slot
+	 */
+	public int getInstNum() {
+<span class="fc" id="L135">		return instNum;</span>
+	}
+	
+	/**
+	 * Print all the instructors in this slot
+	 */
+	public void printInst() {
+<span class="nc bnc" id="L142" title="All 2 branches missed.">		for (int i = 0; i &lt; instructors.length; ++i) {</span>
+<span class="nc" id="L143">			System.out.println(getInstructor(i));</span>
+<span class="nc" id="L144">			System.out.println('\n');</span>
+		}
+<span class="nc" id="L146">	}</span>
+	
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

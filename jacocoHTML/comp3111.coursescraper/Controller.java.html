@@ -1,0 +1,1160 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Controller.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">COMP3111-Team11Repo</a> &gt; <a href="index.source.html" class="el_package">comp3111.coursescraper</a> &gt; <span class="el_source">Controller.java</span></div><h1>Controller.java</h1><pre class="source lang-java linenums">package comp3111.coursescraper;
+
+import java.awt.event.ActionEvent;
+import java.time.LocalTime;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.geometry.Insets;
+import javafx.scene.paint.Color;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import java.util.Random;
+import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
+<span class="fc" id="L35">public class Controller {</span>
+
+    @FXML
+    private Tab tabMain;
+
+    @FXML
+    private TextField textfieldTerm;
+
+    @FXML
+    private TextField textfieldSubject;
+
+    @FXML
+    private Button buttonSearch;
+
+    @FXML
+    private TextField textfieldURL;
+
+    @FXML
+    private Tab tabStatistic;
+
+    @FXML
+    private ComboBox&lt;?&gt; comboboxTimeSlot;
+
+    @FXML
+    private Tab tabFilter;
+
+    @FXML
+    private Tab tabList;
+
+    @FXML
+    private Tab tabTimetable;
+
+    @FXML
+    private Tab tabAllSubject;
+
+    @FXML
+    private ProgressBar progressbar;
+
+    @FXML
+    private TextField textfieldSfqUrl;
+
+    @FXML
+    private Button buttonSfqEnrollCourse;
+    
+    @FXML
+    private Button allSubjectSearch;
+
+    @FXML
+    private Button buttonInstructorSfq;
+
+    @FXML
+    private TextArea textAreaConsole;
+    
+<span class="fc" id="L88">    private Scraper scraper = new Scraper();</span>
+    
+<span class="fc" id="L90">    private Scraper scraperSFQ = new Scraper();</span>
+    
+    @FXML
+    private Button selectAllButton;
+    
+    @FXML
+    private CheckBox checkAM;
+    
+    @FXML
+    private CheckBox checkPM;
+    
+    @FXML
+    private CheckBox checkMon;
+    
+    @FXML
+    private CheckBox checkTue;
+    
+    @FXML
+    private CheckBox checkWed;
+    
+    @FXML
+    private CheckBox checkThu;
+    
+    @FXML
+    private CheckBox checkFri;
+    
+    @FXML
+    private CheckBox checkSat;
+    
+    @FXML
+    private CheckBox checkCC;
+    
+    @FXML
+    private CheckBox checkNoEx;
+    
+    @FXML
+    private CheckBox checkLAT;
+    
+    @FXML
+    private TableView&lt;courseData&gt; courseTable;
+    
+    @FXML
+    private TableColumn&lt;courseData, String&gt; codeCol;
+    
+    @FXML
+    private TableColumn&lt;courseData, String&gt; sectionCol;
+    
+    @FXML
+    private TableColumn&lt;courseData, String&gt; nameCol;
+    
+    @FXML
+    private TableColumn&lt;courseData, String&gt; instructorCol;
+    
+    @FXML
+    private TableColumn&lt;courseData, CheckBox&gt; enrollCol;
+    
+<span class="fc" id="L146">    @FXML</span>
+<span class="fc" id="L147">    private ObservableList&lt;courseData&gt; list = FXCollections.observableArrayList();</span>
+    
+<span class="fc" id="L149">    @FXML</span>
+<span class="fc" id="L150">    private ObservableList&lt;courseData&gt; listAll = FXCollections.observableArrayList();</span>
+    
+    @FXML
+    private List&lt;Course&gt; allCourses;
+    
+<span class="fc" id="L155">    @FXML</span>
+<span class="fc" id="L156">    private ObservableList&lt;courseData&gt; listForPrint = FXCollections.observableArrayList();</span>
+    
+    private String prevURL;
+    
+    private String prevTerm;
+    
+    private String prevSubject;
+    
+<span class="fc" id="L164">    private boolean filterAllSubjects = false;</span>
+
+<span class="fc" id="L166">    private boolean click=false; //detect in Allsubjectsearch</span>
+    
+<span class="fc" id="L168">    private int counteri=0;</span>
+
+ 
+
+	/**
+	 * Check the URL validity
+	 * 
+	 * @param 	error contains error statement only if there is an error
+	 * @return	returns 404 page not found if there is error, no error otherwise
+	 */
+    public String errorCheck(String error) {
+<span class="pc bpc" id="L179" title="1 of 2 branches missed.">    	if (error.equals(&quot;404error&quot;))</span>
+<span class="nc" id="L180">    		return &quot;404 page not found. Check if the URL is correct.&quot;;</span>
+    	else
+<span class="fc" id="L182">    		return &quot;No error&quot;;</span>
+    }
+    
+    // Should be true
+	/**
+	 * Set to true before search or subject search is clicked
+	 * SFQ button is disabled when true.
+	 */
+<span class="fc" id="L190">	private boolean DISABLED = true;</span>
+    
+    //public List&lt;courseData&gt; courseDataSet;
+    /**
+     * Initialize the list of courses scraped and the variables storing the previous URL, previous Term and previous Subject when program starts
+     */
+    @FXML
+    protected void initialize() {
+<span class="fc" id="L198">    	initializeCourseSet();</span>
+<span class="fc" id="L199">    	prevURL = textfieldURL.getText();</span>
+<span class="fc" id="L200">	    prevTerm = textfieldTerm.getText();</span>
+<span class="fc" id="L201">	    prevSubject = textfieldSubject.getText();</span>
+<span class="fc" id="L202">    }</span>
+    
+    /**
+     * For the Select-All button
+     */
+    @FXML
+    protected void selectAll() {
+    	boolean ind;
+<span class="fc bfc" id="L210" title="All 2 branches covered.">    	if(selectAllButton.getText().equals(&quot;Select All&quot;)) {</span>
+<span class="fc" id="L211">    		ind = true;</span>
+<span class="fc" id="L212">    		selectAllButton.setText(&quot;De-select All&quot;);</span>
+    	}
+    	else {
+<span class="fc" id="L215">    		ind = false;</span>
+<span class="fc" id="L216">    		selectAllButton.setText(&quot;Select All&quot;);</span>
+    	}
+    	
+<span class="fc" id="L219">    	checkAM.setSelected(ind);</span>
+<span class="fc" id="L220">    	checkPM.setSelected(ind);</span>
+<span class="fc" id="L221">    	checkMon.setSelected(ind);</span>
+<span class="fc" id="L222">    	checkTue.setSelected(ind);</span>
+<span class="fc" id="L223">    	checkWed.setSelected(ind);</span>
+<span class="fc" id="L224">    	checkThu.setSelected(ind);</span>
+<span class="fc" id="L225">    	checkFri.setSelected(ind);</span>
+<span class="fc" id="L226">    	checkSat.setSelected(ind);</span>
+<span class="fc" id="L227">    	checkCC.setSelected(ind);</span>
+<span class="fc" id="L228">    	checkNoEx.setSelected(ind);</span>
+<span class="fc" id="L229">    	checkLAT.setSelected(ind);</span>
+    	
+<span class="fc" id="L231">    	filterSearch();</span>
+<span class="fc" id="L232">    }</span>
+    
+    // Need to be changed
+    /**
+     * Searches based on the filters applied and print in the console
+     */
+    @FXML
+    protected void filterSearch() {
+    	List&lt;Course&gt; v;
+<span class="fc bfc" id="L241" title="All 2 branches covered.">    	if(!filterAllSubjects) {</span>
+<span class="pc bpc" id="L242" title="2 of 6 branches missed.">	    	if(!prevURL.equals(textfieldURL.getText()) || !prevTerm.equals(textfieldTerm.getText()) || !prevSubject.equals(textfieldSubject.getText())) {</span>
+<span class="fc" id="L243">	    		initializeCourseSet();</span>
+<span class="fc" id="L244">	    		prevURL = textfieldURL.getText();</span>
+<span class="fc" id="L245">	    	    prevTerm = textfieldTerm.getText();</span>
+<span class="fc" id="L246">	    	    prevSubject = textfieldSubject.getText();</span>
+	    	}
+<span class="fc" id="L248">	    	textAreaConsole.setText(&quot;&quot;);</span>
+<span class="fc" id="L249">	    	v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());</span>
+    	}
+    	else {
+<span class="fc" id="L252">    		textAreaConsole.setText(&quot;&quot;);</span>
+<span class="fc" id="L253">	    	v = new ArrayList&lt;Course&gt;(allCourses);</span>
+    	}
+    	// Check for 404 page not found
+<span class="pc bpc" id="L256" title="1 of 2 branches missed.">    	if (!v.isEmpty()) {</span>
+<span class="fc" id="L257">        	String error = errorCheck(v.get(0).getTitle());</span>
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">        	if (error != &quot;No error&quot;) {</span>
+<span class="nc" id="L259">        		textAreaConsole.setText(error);</span>
+<span class="nc" id="L260">        		return;</span>
+        	}
+    	}
+
+    	
+    	// Days
+<span class="fc bfc" id="L266" title="All 6 branches covered.">    	if(checkMon.isSelected() || checkTue.isSelected() || checkWed.isSelected() </span>
+<span class="fc bfc" id="L267" title="All 6 branches covered.">    			|| checkThu.isSelected() || checkFri.isSelected() || checkSat.isSelected()) {</span>
+<span class="fc bfc" id="L268" title="All 2 branches covered.">    		int intMon = (checkMon.isSelected())? 1: 0;</span>
+<span class="fc bfc" id="L269" title="All 2 branches covered.">    		int intTue = (checkTue.isSelected())? 1: 0;</span>
+<span class="fc bfc" id="L270" title="All 2 branches covered.">    		int intWed = (checkWed.isSelected())? 1: 0;</span>
+<span class="fc bfc" id="L271" title="All 2 branches covered.">    		int intThu = (checkThu.isSelected())? 1: 0;</span>
+<span class="fc bfc" id="L272" title="All 2 branches covered.">    		int intFri = (checkFri.isSelected())? 1: 0;</span>
+<span class="fc bfc" id="L273" title="All 2 branches covered.">    		int intSat = (checkSat.isSelected())? 1: 0;</span>
+<span class="fc" id="L274">    		int counter = intMon + intTue + intWed + intThu + intFri + intSat;</span>
+    		// if one of the Days buttons is clicked
+<span class="fc bfc" id="L276" title="All 2 branches covered.">    		if(counter == 1) {</span>
+<span class="fc" id="L277">    			int buttonNum = -1;</span>
+<span class="fc bfc" id="L278" title="All 2 branches covered.">    			if(intMon == 1) buttonNum = 0;</span>
+<span class="fc bfc" id="L279" title="All 2 branches covered.">    			if(intTue == 1) buttonNum = 1;</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">    			if(intWed == 1) buttonNum = 2;</span>
+<span class="fc bfc" id="L281" title="All 2 branches covered.">    			if(intThu == 1) buttonNum = 3;</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">    			if(intFri == 1) buttonNum = 4;</span>
+<span class="fc bfc" id="L283" title="All 2 branches covered.">    			if(intSat == 1) buttonNum = 5;</span>
+    			
+<span class="fc bfc" id="L285" title="All 2 branches covered.">    			for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L286">	    			Course temp = new Course();</span>
+<span class="fc" id="L287">	    			temp.setTitle(v.get(i).getTitle());</span>
+<span class="fc" id="L288">	    			temp.setDescription(v.get(i).getDescription());</span>
+<span class="fc" id="L289">	    			temp.setExclusion(v.get(i).getExclusion());</span>
+<span class="fc" id="L290">	    			temp.setCC4Y(v.get(i).getCC4Y());</span>
+<span class="fc bfc" id="L291" title="All 2 branches covered.">	    			for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="fc bfc" id="L292" title="All 2 branches covered.">	    				if(v.get(i).getSlot(j).getDay() == buttonNum) {</span>
+<span class="fc" id="L293">	    					temp.addSlot(v.get(i).getSlot(j));</span>
+<span class="fc" id="L294">	    					temp.addSection(v.get(i).getSection(j));</span>
+	    				}
+	    			}
+<span class="fc" id="L297">	    			v.remove(i);</span>
+<span class="fc" id="L298">	    			v.add(i, temp);</span>
+	    		}
+<span class="fc" id="L300">    		}</span>
+    		// A section may have zero, one, two, or three slots
+<span class="pc bpc" id="L302" title="1 of 4 branches missed.">    		else if(counter &gt;= 2 &amp;&amp; counter &lt;= 3) {</span>
+<span class="fc" id="L303">    			int[] buttonNums = new int[counter];</span>
+<span class="fc bfc" id="L304" title="All 2 branches covered.">    			for(int i = 0; i &lt; counter; i++)</span>
+    			{
+<span class="fc bfc" id="L306" title="All 2 branches covered.">	    			if(intMon == 1)	{ buttonNums[i] = 0; intMon-=1; continue; }</span>
+<span class="fc bfc" id="L307" title="All 2 branches covered.">	        		if(intTue == 1) { buttonNums[i] = 1; intTue-=1; continue; }</span>
+<span class="pc bpc" id="L308" title="1 of 2 branches missed.">	        		if(intWed == 1) { buttonNums[i] = 2; intWed-=1; continue; }</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">	        		if(intThu == 1) { buttonNums[i] = 3; intThu-=1; continue; }</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">	        		if(intFri == 1) { buttonNums[i] = 4; intFri-=1; continue; }</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">	        		if(intSat == 1) { buttonNums[i] = 5; intSat-=1; continue; }</span>
+    			}
+    			
+<span class="fc" id="L314">    			String prevCode = &quot;&quot;;</span>
+<span class="fc bfc" id="L315" title="All 2 branches covered.">    			for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L316">					Course temp = new Course();</span>
+<span class="fc" id="L317">	    			temp.setTitle(v.get(i).getTitle());</span>
+<span class="fc" id="L318">	    			temp.setDescription(v.get(i).getDescription());</span>
+<span class="fc" id="L319">	    			temp.setExclusion(v.get(i).getExclusion());</span>
+<span class="fc" id="L320">	    			temp.setCC4Y(v.get(i).getCC4Y());</span>
+	    			
+<span class="fc bfc" id="L322" title="All 2 branches covered.">	    			for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="fc" id="L323">	    				Section tempSection = v.get(i).getSection(j);</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">	    				if(prevCode.equals(tempSection.getCode()))</span>
+<span class="fc" id="L325">	    					continue;</span>
+	    				//textAreaConsole.setText(textAreaConsole.getText() + &quot;\n&quot; 
+						//		+ tempSection.getCode());
+<span class="fc" id="L328">	    				int numSlots = v.get(i).getNumSlotsForSec(tempSection.getCode());</span>
+<span class="fc" id="L329">	    				int[] indices = new int[numSlots];</span>
+<span class="fc" id="L330">	    				v.get(i).getDaysOfSection(tempSection.getCode(), indices);</span>
+	    				
+<span class="fc" id="L332">	    				int[] outputIndices = new int[counter];</span>
+<span class="fc" id="L333">	    				int index = 0;</span>
+<span class="fc" id="L334">	    				boolean test = true;</span>
+<span class="fc bfc" id="L335" title="All 2 branches covered.">	    				for(int k = 0; k &lt; numSlots; k++) {</span>
+<span class="fc" id="L336">	    					boolean tempTest = false;</span>
+<span class="fc bfc" id="L337" title="All 2 branches covered.">	    					for(int p = 0; p &lt; counter; p++) {</span>
+<span class="fc bfc" id="L338" title="All 2 branches covered.">	    						if(indices[k] == buttonNums[p]) {</span>
+<span class="fc" id="L339">	    							tempTest = true;</span>
+<span class="fc" id="L340">	    							outputIndices[index++] = j+k;</span>
+	    						}
+	    					}
+<span class="fc bfc" id="L343" title="All 2 branches covered.">	    					if(!tempTest)</span>
+<span class="fc" id="L344">	    						test = false;</span>
+	    				}
+<span class="fc bfc" id="L346" title="All 2 branches covered.">	    				if(numSlots &lt; counter)</span>
+<span class="fc" id="L347">	    					test = false;</span>
+	    				
+<span class="fc bfc" id="L349" title="All 2 branches covered.">	    				if(test) {</span>
+<span class="fc bfc" id="L350" title="All 2 branches covered.">	    					for(int k = 0; k &lt; counter; k++) {</span>
+<span class="fc" id="L351">	    						temp.addSlot(v.get(i).getSlot(outputIndices[k]));</span>
+<span class="fc" id="L352">		    					temp.addSection(v.get(i).getSection(outputIndices[k]));</span>
+	    					}
+	    				}
+<span class="fc" id="L355">	    				prevCode = tempSection.getCode();</span>
+	    			}
+	    			
+<span class="fc" id="L358">	    			v.remove(i);</span>
+<span class="fc" id="L359">	    			v.add(i, temp);</span>
+				}	
+<span class="fc" id="L361">    		}</span>
+    		// More than or equal to 4 buttons will always give no result
+    		else {
+<span class="fc bfc" id="L364" title="All 2 branches covered.">    			for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L365">        			Course temp = new Course();</span>
+<span class="fc" id="L366">        			temp.setTitle(v.get(i).getTitle());</span>
+<span class="fc" id="L367">        			temp.setDescription(v.get(i).getDescription());</span>
+<span class="fc" id="L368">        			temp.setExclusion(v.get(i).getExclusion());</span>
+<span class="fc" id="L369">        			temp.setCC4Y(v.get(i).getCC4Y());</span>
+        			
+        			// deleting all slots
+        			
+<span class="fc" id="L373">        			v.remove(i);</span>
+<span class="fc" id="L374">        			v.add(i, temp);</span>
+        		}
+    		}
+    	}
+    	
+    	
+    	// AM &amp; PM Check boxes
+<span class="fc bfc" id="L381" title="All 4 branches covered.">    	if(checkAM.isSelected() &amp;&amp; checkPM.isSelected()) {</span>
+<span class="fc bfc" id="L382" title="All 2 branches covered.">    		for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L383">    			Course temp = new Course();</span>
+<span class="fc" id="L384">    			temp.setTitle(v.get(i).getTitle());</span>
+<span class="fc" id="L385">    			temp.setDescription(v.get(i).getDescription());</span>
+<span class="fc" id="L386">    			temp.setExclusion(v.get(i).getExclusion());</span>
+<span class="fc" id="L387">    			temp.setCC4Y(v.get(i).getCC4Y());</span>
+<span class="fc bfc" id="L388" title="All 2 branches covered.">    			for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="fc" id="L389">    				int slotsNum = v.get(i).getNumSlotsForSec(v.get(i).getSection(j).getCode());</span>
+<span class="fc" id="L390">    				int[] indices = new int[slotsNum];</span>
+<span class="fc" id="L391">    				v.get(i).getSectionIndex(v.get(i).getSection(j).getCode(), indices);</span>
+<span class="fc" id="L392">    				boolean isBoth = false, isAM = false, isPM = false;</span>
+<span class="fc bfc" id="L393" title="All 2 branches covered.">    				for(int k = 0; k &lt; slotsNum; k++) {</span>
+<span class="pc bpc" id="L394" title="1 of 4 branches missed.">    					if((v.get(i).getSlot(indices[k]).getStartHour() &gt;= 0 &amp;&amp; v.get(i).getSlot(indices[k]).getStartHour() &lt; 12) || </span>
+<span class="pc bpc" id="L395" title="2 of 4 branches missed.">	    						(v.get(i).getSlot(indices[k]).getEndHour() &gt;= 0 &amp;&amp; v.get(i).getSlot(indices[k]).getEndHour() &lt; 12))</span>
+<span class="fc" id="L396">    						isAM = true;</span>
+<span class="pc bpc" id="L397" title="1 of 4 branches missed.">    					if((v.get(i).getSlot(indices[k]).getStartHour() &gt;= 12 &amp;&amp; v.get(i).getSlot(indices[k]).getStartHour() &lt; 24) || </span>
+<span class="pc bpc" id="L398" title="1 of 4 branches missed.">	    						(v.get(i).getSlot(indices[k]).getEndHour() &gt;= 12 &amp;&amp; v.get(i).getSlot(indices[k]).getEndHour() &lt; 24))</span>
+<span class="fc" id="L399">    						isPM = true;</span>
+    				}
+<span class="fc bfc" id="L401" title="All 4 branches covered.">    				isBoth = (isAM &amp;&amp; isPM);</span>
+    				
+<span class="pc bpc" id="L403" title="1 of 4 branches missed.">    				if((v.get(i).getSlot(j).getStartHour() &gt;= 0 &amp;&amp; v.get(i).getSlot(j).getStartHour() &lt; 12) &amp;&amp; </span>
+<span class="pc bpc" id="L404" title="1 of 4 branches missed.">    						(v.get(i).getSlot(j).getEndHour() &gt;= 12 &amp;&amp; v.get(i).getSlot(j).getEndHour() &lt; 24)) </span>
+<span class="fc" id="L405">    					isBoth = true;</span>
+    				
+<span class="fc bfc" id="L407" title="All 2 branches covered.">    				if(isBoth) {</span>
+<span class="fc" id="L408">    					temp.addSlot(v.get(i).getSlot(j));</span>
+<span class="fc" id="L409">    					temp.addSection(v.get(i).getSection(j));</span>
+    				}
+    			}
+<span class="fc" id="L412">    			v.remove(i);</span>
+<span class="fc" id="L413">    			v.add(i, temp);</span>
+    		}
+    	}
+    	
+    	else {
+<span class="fc bfc" id="L418" title="All 2 branches covered.">	    	if(checkAM.isSelected()) {</span>
+<span class="fc bfc" id="L419" title="All 2 branches covered.">	    		for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L420">	    			Course temp = new Course();</span>
+<span class="fc" id="L421">	    			temp.setTitle(v.get(i).getTitle());</span>
+<span class="fc" id="L422">	    			temp.setDescription(v.get(i).getDescription());</span>
+<span class="fc" id="L423">	    			temp.setExclusion(v.get(i).getExclusion());</span>
+<span class="fc" id="L424">	    			temp.setCC4Y(v.get(i).getCC4Y());</span>
+<span class="fc bfc" id="L425" title="All 2 branches covered.">	    			for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="pc bpc" id="L426" title="1 of 4 branches missed.">	    				if((v.get(i).getSlot(j).getStartHour() &gt;= 0 &amp;&amp; v.get(i).getSlot(j).getStartHour() &lt; 12) || </span>
+<span class="pc bpc" id="L427" title="2 of 4 branches missed.">	    						(v.get(i).getSlot(j).getEndHour() &gt;= 0 &amp;&amp; v.get(i).getSlot(j).getEndHour() &lt; 12)) {</span>
+<span class="fc" id="L428">	    					temp.addSlot(v.get(i).getSlot(j));</span>
+<span class="fc" id="L429">	    					temp.addSection(v.get(i).getSection(j));</span>
+	    				}
+	    			}
+<span class="fc" id="L432">	    			v.remove(i);</span>
+<span class="fc" id="L433">	    			v.add(i, temp);</span>
+	    		}
+	    	}
+	    	
+<span class="fc bfc" id="L437" title="All 2 branches covered.">	    	if(checkPM.isSelected()) {</span>
+<span class="fc bfc" id="L438" title="All 2 branches covered.">	    		for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L439">	    			Course temp = new Course();</span>
+<span class="fc" id="L440">	    			temp.setTitle(v.get(i).getTitle());</span>
+<span class="fc" id="L441">	    			temp.setDescription(v.get(i).getDescription());</span>
+<span class="fc" id="L442">	    			temp.setExclusion(v.get(i).getExclusion());</span>
+<span class="fc" id="L443">	    			temp.setCC4Y(v.get(i).getCC4Y());</span>
+<span class="fc bfc" id="L444" title="All 2 branches covered.">	    			for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="pc bpc" id="L445" title="1 of 4 branches missed.">	    				if((v.get(i).getSlot(j).getStartHour() &gt;= 12 &amp;&amp; v.get(i).getSlot(j).getStartHour() &lt; 24) || </span>
+<span class="pc bpc" id="L446" title="1 of 4 branches missed.">	    						(v.get(i).getSlot(j).getEndHour() &gt;= 12 &amp;&amp; v.get(i).getSlot(j).getEndHour() &lt; 24)) {</span>
+<span class="fc" id="L447">	    					temp.addSlot(v.get(i).getSlot(j));</span>
+<span class="fc" id="L448">	    					temp.addSection(v.get(i).getSection(j));</span>
+	    				}
+	    			}
+<span class="fc" id="L451">	    			v.remove(i);</span>
+<span class="fc" id="L452">	    			v.add(i, temp);</span>
+	    		}
+	    	}
+    	}
+    	
+    	
+    	// Common Core
+<span class="fc bfc" id="L459" title="All 2 branches covered.">    	if(checkCC.isSelected()) {</span>
+<span class="fc bfc" id="L460" title="All 2 branches covered.">    		for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L461">    			Course temp = new Course();</span>
+<span class="fc" id="L462">    			temp.setTitle(v.get(i).getTitle());</span>
+<span class="fc" id="L463">    			temp.setDescription(v.get(i).getDescription());</span>
+<span class="fc" id="L464">    			temp.setExclusion(v.get(i).getExclusion());</span>
+<span class="fc" id="L465">    			temp.setCC4Y(v.get(i).getCC4Y());</span>
+    			
+<span class="fc bfc" id="L467" title="All 2 branches covered.">    			for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="fc bfc" id="L468" title="All 2 branches covered.">    				if(v.get(i).getCC4Y().contains(&quot;4Y&quot;)) {</span>
+<span class="fc" id="L469">    					temp.addSlot(v.get(i).getSlot(j));</span>
+<span class="fc" id="L470">    					temp.addSection(v.get(i).getSection(j));</span>
+    				}
+    			}
+<span class="fc" id="L473">    			v.remove(i);</span>
+<span class="fc" id="L474">    			v.add(i, temp);</span>
+    		}
+    	}
+    	
+    	
+    	// No Exclusion
+<span class="fc bfc" id="L480" title="All 2 branches covered.">    	if(checkNoEx.isSelected()) {</span>
+<span class="fc bfc" id="L481" title="All 2 branches covered.">    		for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L482">    			Course temp = new Course();</span>
+<span class="fc" id="L483">    			temp.setTitle(v.get(i).getTitle());</span>
+<span class="fc" id="L484">    			temp.setDescription(v.get(i).getDescription());</span>
+<span class="fc" id="L485">    			temp.setExclusion(v.get(i).getExclusion());</span>
+<span class="fc" id="L486">    			temp.setCC4Y(v.get(i).getCC4Y());</span>
+    			
+<span class="fc bfc" id="L488" title="All 2 branches covered.">    			for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="fc bfc" id="L489" title="All 2 branches covered.">    				if(v.get(i).getExclusion() == &quot;null&quot;) {</span>
+<span class="fc" id="L490">    					temp.addSlot(v.get(i).getSlot(j));</span>
+<span class="fc" id="L491">    					temp.addSection(v.get(i).getSection(j));</span>
+    				}
+    			}
+<span class="fc" id="L494">    			v.remove(i);</span>
+<span class="fc" id="L495">    			v.add(i, temp);</span>
+    		}
+    	}
+    	
+    	
+    	// With Labs or Tutorial
+<span class="fc bfc" id="L501" title="All 2 branches covered.">    	if(checkLAT.isSelected()) {</span>
+<span class="fc bfc" id="L502" title="All 2 branches covered.">    		for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L503">    			Course temp = new Course();</span>
+<span class="fc" id="L504">    			temp.setTitle(v.get(i).getTitle());</span>
+<span class="fc" id="L505">    			temp.setDescription(v.get(i).getDescription());</span>
+<span class="fc" id="L506">    			temp.setExclusion(v.get(i).getExclusion());</span>
+<span class="fc" id="L507">    			temp.setCC4Y(v.get(i).getCC4Y());</span>
+    			
+<span class="fc" id="L509">    			boolean containsLAT = false;</span>
+<span class="fc bfc" id="L510" title="All 2 branches covered.">    			for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="fc bfc" id="L511" title="All 2 branches covered.">    				if(v.get(i).getSection(j).getCode().contains(&quot;LA&quot;)</span>
+<span class="fc bfc" id="L512" title="All 2 branches covered.">    						|| v.get(i).getSection(j).getCode().charAt(0) == 'T') {</span>
+<span class="fc" id="L513">    					containsLAT = true;</span>
+    				}
+    			}
+    			
+<span class="fc bfc" id="L517" title="All 2 branches covered.">    			if(containsLAT) {</span>
+<span class="fc bfc" id="L518" title="All 2 branches covered.">	    			for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="fc" id="L519">	    				temp.addSlot(v.get(i).getSlot(j));</span>
+<span class="fc" id="L520">						temp.addSection(v.get(i).getSection(j));</span>
+	    			}
+    			}
+<span class="fc" id="L523">    			v.remove(i);</span>
+<span class="fc" id="L524">    			v.add(i, temp);</span>
+    		}
+    	}
+    	
+    	
+<span class="fc bfc" id="L529" title="All 2 branches covered.">    	for (Course c : v) {</span>
+<span class="fc" id="L530">    		String newline = &quot;&quot;;</span>
+    		
+<span class="fc bfc" id="L532" title="All 2 branches covered.">    		for (int i = 0; i &lt; c.getNumSlots(); i++) {</span>
+<span class="fc" id="L533">    			Slot t = c.getSlot(i);</span>
+<span class="fc" id="L534">    			Section x = c.getSection(i);</span>
+<span class="fc" id="L535">    			newline += &quot;Slot &quot; + i + &quot;:&quot; + t + &quot; Section &quot; + x.toString() + &quot;\n&quot;;</span>
+    		}
+    		
+    		//check whether slots exist after filtering
+<span class="fc bfc" id="L539" title="All 2 branches covered.">    		if(c.getNumSlots() != 0) {</span>
+<span class="fc" id="L540">    			String newTitle = c.getTitle() + &quot;\n&quot;; // + &quot;Number of sections: &quot; + c.getNumSections() + &quot;\n&quot;;</span>
+<span class="fc" id="L541">    			newTitle += newline;</span>
+<span class="fc" id="L542">    			textAreaConsole.setText(textAreaConsole.getText() + &quot;\n&quot; + newTitle);</span>
+    		}
+<span class="fc" id="L544">    	}</span>
+    	
+<span class="fc" id="L546">    	listFilteredCourses(v);</span>
+<span class="fc" id="L547">    }</span>
+    
+    /**
+     * To keep the enrollment status, list of all courses from the inputs are saved as courseData objects
+     */
+    @FXML
+    protected void initializeCourseSet() {
+<span class="fc bfc" id="L554" title="All 2 branches covered.">    	if(!filterAllSubjects) {</span>
+<span class="fc" id="L555">    		List&lt;Course&gt; v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());</span>
+    		// Check for 404 page not found
+<span class="pc bpc" id="L557" title="1 of 2 branches missed.">        	if(!v.isEmpty()) {</span>
+<span class="fc" id="L558">            	String error = errorCheck(v.get(0).getTitle());</span>
+<span class="pc bpc" id="L559" title="1 of 2 branches missed.">            	if (error != &quot;No error&quot;) {</span>
+<span class="nc" id="L560">            		textAreaConsole.setText(error);</span>
+<span class="nc" id="L561">            		return;</span>
+            	}
+        	}
+
+        	
+<span class="fc" id="L566">        	list.clear();</span>
+<span class="fc" id="L567">        	int id = 0;</span>
+<span class="fc bfc" id="L568" title="All 2 branches covered.">        	for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L569">        		String[] courseInfo = v.get(i).getTitle().split(&quot;-&quot;, 2);</span>
+<span class="fc" id="L570">        		String courseCode = courseInfo[0];</span>
+<span class="fc" id="L571">        		String name = courseInfo[1].substring(0, courseInfo[1].indexOf('(')-1);</span>
+        		
+<span class="fc" id="L573">        		String prevSection = &quot;&quot;;</span>
+<span class="fc bfc" id="L574" title="All 2 branches covered.">        		for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="fc" id="L575">        			String section = v.get(i).getSection(j).getCode();</span>
+<span class="fc bfc" id="L576" title="All 2 branches covered.">        			if(prevSection.equals(section)) {</span>
+<span class="fc" id="L577">        				list.add(list.get(list.size()-1));</span>
+<span class="fc" id="L578">        				continue;</span>
+        			}
+<span class="fc" id="L580">        			String instructor = &quot;&quot;;</span>
+<span class="fc" id="L581">        			int k = 0;</span>
+<span class="fc bfc" id="L582" title="All 2 branches covered.">        			while(k &lt; v.get(i).getSlot(j).getInstNum()-1)</span>
+<span class="fc" id="L583">        				instructor += (v.get(i).getSlot(j).getInstructor(k++)+&quot; / &quot;);</span>
+<span class="fc" id="L584">        			instructor += v.get(i).getSlot(j).getInstructor(k);</span>
+<span class="fc" id="L585">        			CheckBox ch = new CheckBox();</span>
+<span class="fc" id="L586">        			ch.setOnAction(event -&gt; {</span>
+<span class="fc" id="L587">        				enrollSection();</span>
+<span class="fc" id="L588">        				updateTimetable();</span>
+<span class="fc" id="L589">        			});</span>
+<span class="fc" id="L590">        			ch.setId(&quot;enroll&quot;+ String.valueOf(id++));</span>
+<span class="fc" id="L591">        			courseData temp = new courseData(courseCode, section, name, instructor, ch);</span>
+<span class="fc" id="L592">        			list.add(temp);</span>
+<span class="fc" id="L593">        			prevSection = section;</span>
+        		}
+        	}
+<span class="fc" id="L596">    	}</span>
+    	else {
+<span class="fc" id="L598">    		List&lt;Course&gt; v = new ArrayList&lt;Course&gt;(allCourses);</span>
+<span class="pc bpc" id="L599" title="1 of 2 branches missed.">    		if(!v.isEmpty()) {</span>
+<span class="fc" id="L600">            	String error = errorCheck(v.get(0).getTitle());</span>
+<span class="pc bpc" id="L601" title="1 of 2 branches missed.">            	if (error != &quot;No error&quot;) {</span>
+<span class="nc" id="L602">            		textAreaConsole.setText(error);</span>
+<span class="nc" id="L603">            		return;</span>
+            	}
+        	}
+
+        	
+<span class="fc" id="L608">        	list.clear();</span>
+<span class="fc" id="L609">        	int id = 0;</span>
+<span class="fc bfc" id="L610" title="All 2 branches covered.">        	for(int i = 0; i &lt; v.size(); i++) {</span>
+<span class="fc" id="L611">        		String[] courseInfo = v.get(i).getTitle().split(&quot;-&quot;, 2);</span>
+<span class="fc" id="L612">        		String courseCode = courseInfo[0];</span>
+<span class="fc" id="L613">        		String name = courseInfo[1].substring(0, courseInfo[1].indexOf('(')-1);</span>
+        		
+<span class="fc" id="L615">        		String prevSection = &quot;&quot;;</span>
+<span class="fc bfc" id="L616" title="All 2 branches covered.">        		for(int j = 0; j &lt; v.get(i).getNumSlots(); j++) {</span>
+<span class="fc" id="L617">        			String section = v.get(i).getSection(j).getCode();</span>
+<span class="fc bfc" id="L618" title="All 2 branches covered.">        			if(prevSection.equals(section)) {</span>
+<span class="fc" id="L619">        				listAll.add(listAll.get(listAll.size()-1));</span>
+<span class="fc" id="L620">        				continue;</span>
+        			}
+<span class="fc" id="L622">        			String instructor = &quot;&quot;;</span>
+<span class="fc" id="L623">        			int k = 0;</span>
+<span class="fc bfc" id="L624" title="All 2 branches covered.">        			while(k &lt; v.get(i).getSlot(j).getInstNum()-1)</span>
+<span class="fc" id="L625">        				instructor += (v.get(i).getSlot(j).getInstructor(k++)+&quot; / &quot;);</span>
+<span class="fc" id="L626">        			instructor += v.get(i).getSlot(j).getInstructor(k);</span>
+<span class="fc" id="L627">        			CheckBox ch = new CheckBox();</span>
+<span class="fc" id="L628">        			ch.setOnAction(event -&gt; {</span>
+<span class="fc" id="L629">        				enrollSection();</span>
+<span class="fc" id="L630">        				updateTimetable();</span>
+<span class="fc" id="L631">        			});</span>
+<span class="fc" id="L632">        			ch.setId(&quot;enroll&quot;+ String.valueOf(id++));</span>
+<span class="fc" id="L633">        			courseData temp = new courseData(courseCode, section, name, instructor, ch);</span>
+<span class="fc" id="L634">        			listAll.add(temp);</span>
+<span class="fc" id="L635">        			prevSection = section;</span>
+        		}
+        	}
+    	}
+<span class="fc" id="L639">    }</span>
+    
+    /**
+     * Add the course with clicked buttons to the enrolled course list and print in the console
+     */
+    @FXML
+    protected void enrollSection() {
+<span class="fc" id="L646">    	textAreaConsole.clear();</span>
+<span class="fc" id="L647">    	String output = &quot;The following sections are enrolled:\n&quot;;</span>
+<span class="fc" id="L648">    	String prevSection = &quot;&quot;, prevCourseCode = &quot;&quot;;</span>
+<span class="fc bfc" id="L649" title="All 2 branches covered.">    	if(!filterAllSubjects) {</span>
+<span class="fc bfc" id="L650" title="All 2 branches covered.">	    	for(int i = 0; i &lt; list.size(); i++) {</span>
+<span class="fc bfc" id="L651" title="All 2 branches covered.">	    		if(list.get(i).getEnroll().isSelected()) {</span>
+<span class="fc bfc" id="L652" title="All 4 branches covered.">	    			if(prevSection.equals(list.get(i).getSection()) &amp;&amp; prevCourseCode.equals(list.get(i).getCourseCode()))</span>
+<span class="fc" id="L653">	    				continue;</span>
+<span class="fc" id="L654">	    			output += list.get(i).getCourseCode()+&quot; - &quot;+list.get(i).getSection()+&quot; - &quot;+list.get(i).getName()+&quot; - &quot;+list.get(i).getInstructor()+&quot;\n&quot;;</span>
+<span class="fc" id="L655">	    			prevSection = list.get(i).getSection();</span>
+<span class="fc" id="L656">	    			prevCourseCode = list.get(i).getCourseCode();</span>
+	    		}
+	    	}
+    	}
+    	else {
+<span class="fc bfc" id="L661" title="All 2 branches covered.">    		for(int i = 0; i &lt; listAll.size(); i++) {</span>
+<span class="fc bfc" id="L662" title="All 2 branches covered.">	    		if(listAll.get(i).getEnroll().isSelected()) {</span>
+<span class="pc bpc" id="L663" title="1 of 4 branches missed.">	    			if(prevSection.equals(listAll.get(i).getSection()) &amp;&amp; prevCourseCode.equals(listAll.get(i).getCourseCode()))</span>
+<span class="nc" id="L664">	    				continue;</span>
+<span class="fc" id="L665">	    			output += listAll.get(i).getCourseCode()+&quot; - &quot;+listAll.get(i).getSection()+&quot; - &quot;+listAll.get(i).getName()+&quot; - &quot;+listAll.get(i).getInstructor()+&quot;\n&quot;;</span>
+<span class="fc" id="L666">	    			prevSection = listAll.get(i).getSection();</span>
+<span class="fc" id="L667">	    			prevCourseCode = listAll.get(i).getCourseCode();</span>
+	    		}
+	    	}
+    	}
+<span class="fc" id="L671">    	textAreaConsole.setText(output);</span>
+<span class="fc" id="L672">    }</span>
+    
+    /**
+     * Put courses from the Filter search result to the TableView in the List tab
+     * @param v list of courses from the filtering search
+     */
+    protected void listFilteredCourses(List&lt;Course&gt; v) {
+    	// Need to separate for search and allsearch
+<span class="fc" id="L680">    	listForPrint.clear();</span>
+<span class="fc" id="L681">    	int indexV = 0;</span>
+<span class="fc" id="L682">    	int indexSection = 0;</span>
+<span class="fc" id="L683">    	String prevSection = &quot;&quot;;</span>
+<span class="fc bfc" id="L684" title="All 2 branches covered.">    	if(!filterAllSubjects) {</span>
+<span class="fc bfc" id="L685" title="All 2 branches covered.">	    	for(int i = 0; i &lt; list.size(); i++) {</span>
+<span class="fc bfc" id="L686" title="All 2 branches covered.">	    		if(indexV &gt;= v.size())</span>
+<span class="fc" id="L687">	    			break;</span>
+<span class="fc bfc" id="L688" title="All 2 branches covered.">	    		if(v.get(indexV).getNumSlots() == 0) {</span>
+<span class="fc" id="L689">	    			indexV++;</span>
+<span class="fc" id="L690">	    			i--;</span>
+<span class="fc" id="L691">	    			continue;</span>
+	    		}
+	    		
+	    		// get slot info in v
+<span class="fc" id="L695">	    		String[] courseInfo = v.get(indexV).getTitle().split(&quot;-&quot;, 2);</span>
+<span class="fc" id="L696">	    		String courseCodeV = courseInfo[0];</span>
+	    		
+<span class="fc bfc" id="L698" title="All 2 branches covered.">	    		if(listForPrint.size() != 0 </span>
+<span class="fc bfc" id="L699" title="All 2 branches covered.">	    				&amp;&amp; (listForPrint.get(listForPrint.size()-1).getSection().equals(v.get(indexV).getSection(indexSection).getCode())</span>
+<span class="fc bfc" id="L700" title="All 2 branches covered.">	    				&amp;&amp; listForPrint.get(listForPrint.size()-1).getCourseCode().equals(courseCodeV))) {</span>
+<span class="fc bfc" id="L701" title="All 2 branches covered.">	    			if(indexSection &gt;= v.get(indexV).getNumSlots()-1) {</span>
+<span class="fc" id="L702">		    			indexSection = 0;</span>
+<span class="fc" id="L703">		    			indexV++;</span>
+		    		}
+		    		else
+<span class="fc" id="L706">		    			indexSection++;</span>
+<span class="fc" id="L707">	    			continue;</span>
+	    		}
+	    			
+<span class="fc bfc" id="L710" title="All 2 branches covered.">	    		if(prevSection.equals(list.get(i).getSection())</span>
+<span class="fc bfc" id="L711" title="All 2 branches covered.">	    				&amp;&amp; listForPrint.get(listForPrint.size()-1).getCourseCode().equals(list.get(i).getCourseCode()))</span>
+<span class="fc" id="L712">	    			continue;</span>
+	    		
+	    		
+<span class="fc" id="L715">	    		String nameV = v.get(indexV).getSection(indexSection).getCode();</span>
+	    		// Add slots that are in result of filtering only
+	    		
+	        	/*textAreaConsole.setText(textAreaConsole.getText()
+	        			+courseCodeV+&quot;\t&quot;+nameV+&quot;\t&quot;
+	        			+list.get(i).getCourseCode()+&quot;\t&quot;+list.get(i).getSection()+&quot;\t&quot;
+	        			+courseCodeV.equals(list.get(i).getCourseCode())+&quot;\t&quot;
+	        			+nameV.equals(list.get(i).getSection())
+	        			+&quot;\n&quot;);*/
+<span class="fc bfc" id="L724" title="All 4 branches covered.">	    		if(courseCodeV.equals(list.get(i).getCourseCode()) &amp;&amp; nameV.equals(list.get(i).getSection())) {</span>
+<span class="fc" id="L725">		    		listForPrint.add(list.get(i));</span>
+<span class="fc" id="L726">		    		prevSection = list.get(i).getSection();</span>
+<span class="fc bfc" id="L727" title="All 2 branches covered.">		    		if(indexSection &gt;= v.get(indexV).getNumSlots()-1) {</span>
+<span class="fc" id="L728">		    			indexSection = 0;</span>
+<span class="fc" id="L729">		    			indexV++;</span>
+		    		}
+		    		else
+<span class="fc" id="L732">		    			indexSection++;</span>
+	    		}
+	    	}
+    	}
+    	else {
+<span class="fc bfc" id="L737" title="All 2 branches covered.">    		for(int i = 0; i &lt; listAll.size(); i++) {</span>
+<span class="fc bfc" id="L738" title="All 2 branches covered.">	    		if(indexV &gt;= v.size())</span>
+<span class="fc" id="L739">	    			break;</span>
+<span class="fc bfc" id="L740" title="All 2 branches covered.">	    		if(v.get(indexV).getNumSlots() == 0) {</span>
+<span class="fc" id="L741">	    			indexV++;</span>
+<span class="fc" id="L742">	    			i--;</span>
+<span class="fc" id="L743">	    			continue;</span>
+	    		}
+	    		
+	    		// get slot info in v
+<span class="fc" id="L747">	    		String[] courseInfo = v.get(indexV).getTitle().split(&quot;-&quot;, 2);</span>
+<span class="fc" id="L748">	    		String courseCodeV = courseInfo[0];</span>
+	    		
+<span class="fc bfc" id="L750" title="All 2 branches covered.">	    		if(listForPrint.size() != 0 </span>
+<span class="fc bfc" id="L751" title="All 2 branches covered.">	    				&amp;&amp; (listForPrint.get(listForPrint.size()-1).getSection().equals(v.get(indexV).getSection(indexSection).getCode())</span>
+<span class="fc bfc" id="L752" title="All 2 branches covered.">	    				&amp;&amp; listForPrint.get(listForPrint.size()-1).getCourseCode().equals(courseCodeV))) {</span>
+<span class="fc bfc" id="L753" title="All 2 branches covered.">	    			if(indexSection &gt;= v.get(indexV).getNumSlots()-1) {</span>
+<span class="fc" id="L754">		    			indexSection = 0;</span>
+<span class="fc" id="L755">		    			indexV++;</span>
+		    		}
+		    		else
+<span class="fc" id="L758">		    			indexSection++;</span>
+<span class="fc" id="L759">	    			continue;</span>
+	    		}
+	    			
+<span class="fc bfc" id="L762" title="All 2 branches covered.">	    		if(prevSection.equals(listAll.get(i).getSection())</span>
+<span class="fc bfc" id="L763" title="All 2 branches covered.">	    				&amp;&amp; listForPrint.get(listForPrint.size()-1).getCourseCode().equals(listAll.get(i).getCourseCode()))</span>
+<span class="fc" id="L764">	    			continue;</span>
+	    		
+	    		
+<span class="fc" id="L767">	    		String nameV = v.get(indexV).getSection(indexSection).getCode();</span>
+	    		// Add slots that are in result of filtering only
+	    		
+	        	/*textAreaConsole.setText(textAreaConsole.getText()
+	        			+courseCodeV+&quot;\t&quot;+nameV+&quot;\t&quot;
+	        			+list.get(i).getCourseCode()+&quot;\t&quot;+list.get(i).getSection()+&quot;\t&quot;
+	        			+courseCodeV.equals(list.get(i).getCourseCode())+&quot;\t&quot;
+	        			+nameV.equals(list.get(i).getSection())
+	        			+&quot;\n&quot;);*/
+<span class="fc bfc" id="L776" title="All 4 branches covered.">	    		if(courseCodeV.equals(listAll.get(i).getCourseCode()) &amp;&amp; nameV.equals(listAll.get(i).getSection())) {</span>
+<span class="fc" id="L777">		    		listForPrint.add(listAll.get(i));</span>
+<span class="fc" id="L778">		    		prevSection = listAll.get(i).getSection();</span>
+<span class="fc bfc" id="L779" title="All 2 branches covered.">		    		if(indexSection &gt;= v.get(indexV).getNumSlots()-1) {</span>
+<span class="fc" id="L780">		    			indexSection = 0;</span>
+<span class="fc" id="L781">		    			indexV++;</span>
+		    		}
+		    		else
+<span class="fc" id="L784">		    			indexSection++;</span>
+	    		}
+	    	}
+    	}
+    	
+<span class="fc" id="L789">    	courseTable.setItems(listForPrint);</span>
+<span class="fc" id="L790">    	codeCol.setCellValueFactory(new PropertyValueFactory&lt;courseData,String&gt;(&quot;courseCode&quot;));</span>
+<span class="fc" id="L791">    	sectionCol.setCellValueFactory(new PropertyValueFactory&lt;courseData,String&gt;(&quot;section&quot;));</span>
+<span class="fc" id="L792">    	nameCol.setCellValueFactory(new PropertyValueFactory&lt;courseData,String&gt;(&quot;name&quot;));</span>
+<span class="fc" id="L793">    	instructorCol.setCellValueFactory(new PropertyValueFactory&lt;courseData,String&gt;(&quot;instructor&quot;));</span>
+<span class="fc" id="L794">    	enrollCol.setCellValueFactory(new PropertyValueFactory&lt;courseData,CheckBox&gt;(&quot;enroll&quot;));</span>
+<span class="fc" id="L795">    }</span>
+    
+    @FXML
+    void updateTimetable() {
+    	//timetable change start
+    	
+<span class="fc" id="L801">    	int test=0;</span>
+<span class="fc" id="L802">    	String prech=&quot;&quot;;</span>
+<span class="fc" id="L803">    	AnchorPane ap= (AnchorPane)tabTimetable.getContent();</span>
+
+    	//get original table index. 
+<span class="fc bfc" id="L806" title="All 2 branches covered.">    	if(counteri==0)</span>
+<span class="fc" id="L807">    	counteri=ap.getChildren().size()-1;</span>
+    	
+    	//initialize table
+<span class="fc" id="L810">    	ap.getChildren().remove(counteri, ap.getChildren().size());</span>
+    	 
+
+    	
+   	 
+    	
+<span class="fc bfc" id="L816" title="All 2 branches covered.">    	for(int i = 0; i &lt; list.size(); i++) {</span>
+    			
+<span class="fc bfc" id="L818" title="All 2 branches covered.">    	    if(list.get(i).getEnroll().isSelected()) {</span>
+    	    	
+<span class="fc" id="L820">    	    	Random rand = new Random();</span>
+<span class="fc" id="L821">    	    	int r = rand.nextInt(255);</span>
+<span class="fc" id="L822">    	    	int g = rand.nextInt(255);</span>
+<span class="fc" id="L823">    	    	int b = rand.nextInt(255);</span>
+<span class="fc" id="L824">    	    	Color randomColor = Color.rgb(r, g, b, 0.1);</span>
+
+
+    	    	
+<span class="fc" id="L828">    	    	List&lt;Course&gt; v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());</span>
+<span class="fc" id="L829">    	    	double start=0,end=0,day=0;</span>
+<span class="fc bfc" id="L830" title="All 2 branches covered.">    	    	for(int j=0;j&lt;v.size();j++)</span>
+    	    	{
+<span class="fc" id="L832">    	    		String[] courseInfo = v.get(j).getTitle().split(&quot;-&quot;, 2);</span>
+<span class="fc" id="L833">    	    					String code=courseInfo[0];</span>
+    		
+<span class="fc bfc" id="L835" title="All 2 branches covered.">    	    		if(code.equals(list.get(i).getCourseCode()))</span>
+    	    		{
+    	    			
+    	    			
+<span class="fc bfc" id="L839" title="All 2 branches covered.">    	    			for(int k=0;k&lt;v.get(j).getNumSlots();k++)</span>
+    	    			{
+    	    				String ch;
+    	    				
+<span class="fc" id="L843">    	    				ch =v.get(j).getSection(k).getCode();</span>
+    	    				//check case : System.out.println(&quot;ch: &quot; + ch);
+    	    				//check case: System.out.println(&quot;real ch: &quot; + list.get(i).getSection());
+<span class="fc bfc" id="L846" title="All 2 branches covered.">    	    				if(ch.equals(list.get(i).getSection()))</span>
+    	    				{	
+<span class="fc bfc" id="L848" title="All 4 branches covered.">    	    					if(prech.contentEquals(code+ch) &amp;&amp; test!=i)continue;</span>
+    	    					
+    	    					//check case: System.out.println(code + ch + &quot; Day: &quot; + v.get(j).getSlot(k).getDay() + &quot; Time: &quot; + v.get(j).getSlot(k).getStartHour()+v.get(j).getSlot(k).getStartMinute() + &quot; - &quot; + v.get(j).getSlot(k).getEndHour()+v.get(j).getSlot(k).getEndMinute());
+<span class="fc" id="L851">    	    					prech=code+ch;test=i;</span>
+    	    					
+    	    					
+    	    					
+<span class="fc" id="L855">    	    					start = ((float)v.get(j).getSlot(k).getStartHour()-9)*20;</span>
+<span class="fc" id="L856">    	    					start +=((float)v.get(j).getSlot(k).getStartMinute()/3);</span>
+    	    					
+<span class="fc" id="L858">    	    					end = (float) (v.get(j).getSlot(k).getEndHour()-v.get(j).getSlot(k).getStartHour())*20;</span>
+<span class="fc" id="L859">    	    					end +=(float)(v.get(j).getSlot(k).getEndMinute()-v.get(j).getSlot(k).getStartMinute())/3;</span>
+    	    					
+<span class="fc" id="L861">    	    					day= (float)v.get(j).getSlot(k).getDay()*100+102; //102 is initial value, *100 is interval</span>
+    	    					
+<span class="fc" id="L863">    	    	    	    	Label randomLabel = new Label(list.get(i).getCourseCode() + &quot;\n&quot; + list.get(i).getSection());</span>
+
+    	    	    	    	
+<span class="fc" id="L866">    	    	    	    	randomLabel.setBackground(new Background(new BackgroundFill(randomColor , CornerRadii.EMPTY, Insets.EMPTY)));</span>
+<span class="fc" id="L867">    	    	    	    	randomLabel.setLayoutX(day);</span>
+<span class="fc" id="L868">    	    	    	    	randomLabel.setLayoutY(start+45); // 65-45= y+20= 1 hour ,45 is initial value, 20 is interval of 1 hour</span>
+<span class="fc" id="L869">    	    	    	    	randomLabel.setMinWidth(100.0);</span>
+<span class="fc" id="L870">    	    	    	    	randomLabel.setMaxWidth(100.0);</span>
+<span class="fc" id="L871">    	    	    	    	randomLabel.setMinHeight(end);</span>
+<span class="fc" id="L872">    	    	    	    	randomLabel.setMaxHeight(end+5);</span>
+<span class="fc" id="L873">    	    	    	    	ap.getChildren().addAll(randomLabel);</span>
+    	    					
+    	    						
+    	    				}
+    	    			}
+    	    		}
+    	    	}
+    	
+
+    	   	  }
+    	    }
+<span class="fc" id="L884">    }</span>
+   //timetable end
+    @FXML
+    void allSubjectSearch() {
+    	// For disabling SFQ button until Search button is clicked
+<span class="fc" id="L889">       	DISABLED = false;</span>
+<span class="fc" id="L890">    	buttonSfqEnrollCourse.setDisable(DISABLED);</span>
+<span class="fc bfc" id="L891" title="All 2 branches covered.">    	click=!click;</span>
+<span class="fc" id="L892">    	int count=0;</span>
+<span class="fc" id="L893">    	int subcount=0;</span>
+    	//List&lt;Course&gt; v= new LinkedList&lt;&gt;();
+<span class="fc" id="L895">    	List&lt;Course&gt; v = new Vector&lt;Course&gt;();</span>
+<span class="fc" id="L896">    	List&lt;Course&gt; temp = new Vector&lt;Course&gt;();</span>
+<span class="fc" id="L897">    	String []sub= {&quot;ACCT&quot;, &quot;AESF&quot;, &quot;BIBU&quot;,&quot;BIEN&quot;,&quot;BIPH&quot;,&quot;BTEC&quot;, &quot;CBME&quot;, &quot;CENG&quot;, &quot;CHEM&quot;,&quot;CHMS&quot;, &quot;CIEM&quot;, &quot;CIVL&quot;, &quot;COMP&quot;,&quot;CSIC&quot;, &quot;CSIT&quot;, &quot;ECON&quot;, &quot;EEMT&quot;, &quot;EESM&quot;,&quot;ELEC&quot;,&quot;EMBA&quot;,&quot;ENEG&quot;,&quot;ENGG&quot;, &quot;ENTR&quot;, &quot;ENVR&quot;, &quot;ENVS&quot;, &quot;EVNG&quot;,&quot;EVSM&quot;, &quot;FINA&quot;,&quot;GBUS&quot;,&quot;GFIN&quot;,&quot;GNED&quot;, &quot;HART&quot;, &quot;HHMS&quot;, &quot;HLTH&quot;,&quot;HMMA&quot;,&quot;HUMA&quot;, &quot;IBTM&quot;,&quot;IDPO&quot;,&quot;IEDA&quot;,&quot;IIMP&quot;,&quot;IMBA&quot;, &quot;ISDN&quot;, &quot;ISOM&quot;, &quot;JEVE&quot;,&quot;LABU&quot;,&quot;LANG&quot;, &quot;LIFS&quot;, &quot;MAED&quot;, &quot;MAFS&quot;, &quot;MARK&quot;, &quot;MATH&quot;, &quot;MECH&quot;,&quot;MESF&quot;,&quot;MFIT&quot;, &quot;MGCS&quot;, &quot;MGMT&quot;,&quot;MILE&quot;, &quot;MIMT&quot;, &quot;MSBD&quot;,&quot;MSDM&quot;,&quot;NANO&quot;, &quot;OCES&quot;,&quot;PDEV&quot;, &quot;PHYS&quot;,&quot;PPOL&quot;,&quot;RMBI&quot;, &quot;SBMT&quot;,&quot;SCIE&quot;,&quot;SHSS&quot;, &quot;SOSC&quot;,&quot;SSMA&quot;,&quot;SUST&quot;,&quot;TEMG&quot;, &quot;UROP&quot;,&quot;WBBA&quot;};</span>
+<span class="fc bfc" id="L898" title="All 2 branches covered.">    	for(int i=0;i&lt;sub.length;i++)</span>
+    	{
+<span class="fc" id="L900">    		textfieldSubject.setText(sub[i]);</span>
+<span class="fc" id="L901">    		temp.clear();</span>
+<span class="fc" id="L902">    		temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());</span>
+<span class="fc" id="L903">    		subcount+=temp.size();</span>
+<span class="fc bfc" id="L904" title="All 2 branches covered.">    		for(int j=0;j&lt;temp.size();j++)</span>
+    		{
+<span class="fc bfc" id="L906" title="All 2 branches covered.">    			if (temp.get(j).getTitle().equals(&quot;404error&quot;))</span>
+<span class="fc" id="L907">    				continue;</span>
+    			
+<span class="fc" id="L909">    			v.add(temp.get(j));</span>
+    		}
+    	
+    	}
+    	
+    		// Check for 404 page not found
+<span class="fc bfc" id="L915" title="All 2 branches covered.">    	if (v.isEmpty()) {</span>
+<span class="fc" id="L916">    		textAreaConsole.setText(&quot;404 page not found. Check if the URL is correct.&quot;);</span>
+<span class="fc" id="L917">    		return;</span>
+    	}
+<span class="pc bpc" id="L919" title="1 of 2 branches missed.">    	if (!v.isEmpty()) {</span>
+<span class="fc" id="L920">    		String error = errorCheck(v.get(0).getTitle());</span>
+<span class="pc bpc" id="L921" title="1 of 2 branches missed.">    		if (error != &quot;No error&quot;) {</span>
+<span class="nc" id="L922">    			textAreaConsole.setText(error);</span>
+<span class="nc" id="L923">    			return;</span>
+    		}
+    	}
+<span class="fc bfc" id="L926" title="All 2 branches covered.">       	if(click)</span>
+        {
+<span class="fc" id="L928">        	textAreaConsole.setText(&quot;Total Number of Categories/Code Prefix: &quot; + subcount);</span>
+<span class="fc" id="L929">        	double progress=0.0f;</span>
+<span class="fc" id="L930">        	progressbar.setProgress(progress);</span>
+       	}
+       
+<span class="pc bpc" id="L933" title="1 of 4 branches missed.">        if(!click &amp;&amp; v.size()!=0)</span>
+        {
+<span class="fc" id="L935">        	double progress=0.0f;</span>
+<span class="fc bfc" id="L936" title="All 2 branches covered.">        	for(int i=0;i&lt;v.size();i++) {</span>
+
+<span class="fc" id="L938">        	   	System.out.println(v.get(i).getTitle() + &quot; is done&quot;);</span>
+<span class="fc" id="L939">        		progress=(float)i/v.size() ;</span>
+
+<span class="fc" id="L941">        		progressbar.setProgress(progress);</span>
+        		    	
+<span class="fc" id="L943">        		String[] courseInfo = v.get(i).getTitle().split(&quot;-&quot;, 2);</span>
+<span class="fc" id="L944">        		String code=courseInfo[0];</span>
+<span class="pc bpc" id="L945" title="1 of 2 branches missed.">        		if(code!=&quot;&quot;)count++;</span>
+        	}
+<span class="fc" id="L947">        	textAreaConsole.setText(&quot;Total Number of Courses fetched: &quot; + count);</span>
+        	
+        	// Indicator for filterSearch()
+<span class="fc" id="L950">        	filterAllSubjects = true;</span>
+<span class="fc" id="L951">        	allCourses = v;</span>
+<span class="fc" id="L952">        	initializeCourseSet();</span>
+        }
+    	
+<span class="fc" id="L955">    }</span>
+
+	/**
+	 * Scrape and prints instructors' SFQ data
+	 * &lt;p&gt;
+	 * This function scrape data from the SFQ web site and 
+	 * get the average SFQ data for each instructor on the
+	 * web site.
+	 * &lt;/p&gt;
+	 */
+    @FXML
+    void findInstructorSfq() {
+<span class="fc" id="L967">    	textAreaConsole.setText(&quot;&quot;);</span>
+<span class="fc" id="L968">    	List&lt;SFQinstructor&gt; v = scraperSFQ.scrapeSFQinst(textfieldSfqUrl.getText());</span>
+    	
+    	
+    	// Check for 404 page not found
+<span class="pc bpc" id="L972" title="1 of 2 branches missed.">    	if (v.isEmpty()) {</span>
+<span class="nc" id="L973">    		textAreaConsole.setText(&quot;404 page not found. Check if the URL is correct.&quot;);</span>
+<span class="nc" id="L974">    		return;</span>
+    	}
+<span class="pc bpc" id="L976" title="1 of 2 branches missed.">    	if (!v.isEmpty()) {</span>
+<span class="fc" id="L977">        	String error = errorCheck(v.get(0).getName());</span>
+<span class="pc bpc" id="L978" title="1 of 2 branches missed.">        	if (error != &quot;No error&quot;) {</span>
+<span class="nc" id="L979">        		textAreaConsole.setText(error);</span>
+<span class="nc" id="L980">        		return;</span>
+        	}
+    	}
+
+    	
+<span class="fc bfc" id="L985" title="All 2 branches covered.">    	for (SFQinstructor inst : v) {</span>
+<span class="fc" id="L986">    		String newline = inst.getName() + &quot; Course Overall Mean: &quot; + inst.getCourseOverallMean() +</span>
+<span class="fc" id="L987">    				&quot; Instructor Overall Mean: &quot; + inst.getInstructorOverallMean() + </span>
+<span class="fc" id="L988">    				&quot; Response Rate: &quot; + inst.getResponseRate() + &quot;%&quot;;</span>
+<span class="fc" id="L989">    		textAreaConsole.setText(textAreaConsole.getText() + &quot;\n&quot; + newline);</span>
+<span class="fc" id="L990">    	}</span>
+<span class="fc" id="L991">    }</span>
+    
+
+
+	/**
+	 * Scrape and print SFQ data for each course.
+	 * &lt;p&gt;
+	 * This function scrape data from the SFQ web site and 
+	 * get the average SFQ data for each course on the web 
+	 * site.
+	 * &lt;/p&gt;
+	 */
+    @FXML
+    void findSfqEnrollCourse() {
+<span class="fc" id="L1005">    	textAreaConsole.setText(&quot;&quot;);</span>
+<span class="fc" id="L1006">    	buttonSfqEnrollCourse.setDisable(DISABLED);</span>
+<span class="pc bpc" id="L1007" title="1 of 2 branches missed.">    	if (DISABLED)</span>
+<span class="nc" id="L1008">    		return;</span>
+<span class="fc" id="L1009">    	List&lt;Course&gt; v = scraperSFQ.scrapeSFQ(textfieldSfqUrl.getText());</span>
+    	
+    	// Check for 404 page not found
+<span class="pc bpc" id="L1012" title="1 of 2 branches missed.">    	if (v.isEmpty()) {</span>
+<span class="nc" id="L1013">    		textAreaConsole.setText(&quot;404 page not found. Check if the URL is correct.&quot;);</span>
+<span class="nc" id="L1014">    		return;</span>
+    	}
+<span class="pc bpc" id="L1016" title="1 of 2 branches missed.">    	if (!v.isEmpty()) {</span>
+<span class="fc" id="L1017">        	String error = errorCheck(v.get(0).getTitle());</span>
+<span class="pc bpc" id="L1018" title="1 of 2 branches missed.">        	if (error != &quot;No error&quot;) {</span>
+<span class="nc" id="L1019">        		textAreaConsole.setText(error);</span>
+<span class="nc" id="L1020">        		return;</span>
+        	}
+    	}
+
+    	
+<span class="fc" id="L1025">    	String prev = &quot;&quot;;</span>
+<span class="fc bfc" id="L1026" title="All 2 branches covered.">    	for (courseData d : list) {</span>
+<span class="pc bpc" id="L1027" title="3 of 4 branches missed.">    		if (!d.getEnroll().isSelected() || prev == d.getCourseCode())</span>
+<span class="nc" id="L1028">    			continue;</span>
+<span class="nc bnc" id="L1029" title="All 2 branches missed.">    		for (Course c : v) {</span>
+<span class="nc bnc" id="L1030" title="All 2 branches missed.">    			if (d.getCourseCode().contentEquals(c.getTitle().substring(1))) {</span>
+<span class="nc" id="L1031">    	    		prev = d.getCourseCode();</span>
+<span class="nc" id="L1032">    				String newline = c.getTitle().substring(1) + &quot; Course Overall Mean: &quot; + c.getCourseOverallMean() +</span>
+<span class="nc" id="L1033">    	    				&quot; Instructor Overall Mean: &quot; + c.getInstructorOverallMean() + </span>
+<span class="nc" id="L1034">    	    				&quot; Response Rate: &quot; + c.getResponseRate();</span>
+<span class="nc" id="L1035">    	    		textAreaConsole.setText(textAreaConsole.getText() + &quot;\n&quot; + newline);</span>
+<span class="nc" id="L1036">    	    		break;</span>
+    			}
+<span class="nc" id="L1038">    		}</span>
+<span class="nc" id="L1039">    	}    	</span>
+<span class="fc" id="L1040">    }</span>
+    
+
+	/**
+	 * Scrape and print data for each course
+	 * &lt;p&gt;
+	 * This function scrape data from the course catalog 
+	 * web site to get the information for each section. 
+	 * &lt;/p&gt;
+	 */
+    @FXML
+    void search() {
+<span class="fc" id="L1052">    	textAreaConsole.setText(&quot;&quot;);</span>
+    	// For disabling SFQ button until Search button is clicked
+<span class="fc" id="L1054">    	DISABLED = false;</span>
+<span class="fc" id="L1055">    	buttonSfqEnrollCourse.setDisable(DISABLED);</span>
+<span class="fc" id="L1056">    	List&lt;Course&gt; v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());</span>
+    	// indicator for filterSearch()
+<span class="fc" id="L1058">    	filterAllSubjects = false;</span>
+<span class="fc" id="L1059">    	initializeCourseSet();</span>
+    	
+    	// Check for 404 page not found
+<span class="pc bpc" id="L1062" title="1 of 2 branches missed.">    	if (!v.isEmpty()) {</span>
+<span class="fc" id="L1063">        	String error = errorCheck(v.get(0).getTitle());</span>
+<span class="pc bpc" id="L1064" title="1 of 2 branches missed.">        	if (error != &quot;No error&quot;) {</span>
+<span class="nc" id="L1065">        		textAreaConsole.setText(error);</span>
+<span class="nc" id="L1066">        		return;</span>
+        	}
+    	}
+    	
+<span class="fc" id="L1070">    	PriorityQueue&lt;String&gt; instructors = new PriorityQueue&lt;String&gt;();</span>
+    	
+    	// Add all instructors to the list
+<span class="fc bfc" id="L1073" title="All 2 branches covered.">    	for (Course c : v) {</span>
+<span class="fc bfc" id="L1074" title="All 2 branches covered.">    		for(int i = 0; i &lt; c.getNumSlots(); ++i) {</span>
+<span class="fc bfc" id="L1075" title="All 2 branches covered.">    			for(int j = 0; j &lt; c.getSlot(i).getInstNum(); ++j) {</span>
+<span class="fc bfc" id="L1076" title="All 2 branches covered.">    				if(instructors.contains(c.getSlot(i).getInstructor(j))) {</span>
+<span class="fc" id="L1077">    					continue;</span>
+    				}
+    				else {
+<span class="fc" id="L1080">    					instructors.add(c.getSlot(i).getInstructor(j));</span>
+    				}
+    			}
+    		}
+<span class="fc" id="L1084">    	}</span>
+    	    	
+<span class="fc bfc" id="L1086" title="All 2 branches covered.">    	for (Course c : v) {</span>
+<span class="fc" id="L1087">    		String newline = c.getTitle() + &quot;\n&quot;;</span>
+<span class="fc bfc" id="L1088" title="All 2 branches covered.">    		for (int i = 0; i &lt; c.getNumSlots(); i++) {</span>
+<span class="fc" id="L1089">    			Slot t = c.getSlot(i);</span>
+<span class="fc" id="L1090">    			Section x = c.getSection(i);</span>
+<span class="fc" id="L1091">    			newline += &quot;Slot &quot; + i + &quot;:&quot; + t + &quot; Section &quot; + x.toString() + &quot;\n&quot;;</span>
+    			
+    			// Display only the instructors who does not have teaching assignment at Tu 3:10 pm
+<span class="fc" id="L1094">    			LocalTime time = LocalTime.of(15, 10);</span>
+<span class="fc bfc" id="L1095" title="All 6 branches covered.">    			if(t.getDay() == 1 &amp;&amp; t.getStart().isBefore(time) &amp;&amp; t.getEnd().isAfter(time)) {</span>
+    				// remove from the instructor list
+<span class="fc bfc" id="L1097" title="All 2 branches covered.">    				for(int j = 0; j &lt; t.getInstNum(); ++j) {</span>
+<span class="fc" id="L1098">    					instructors.remove(t.getInstructor(j));</span>
+    				}
+    			}
+    			
+    		}
+<span class="fc" id="L1103">    		textAreaConsole.setText(textAreaConsole.getText() + &quot;\n&quot; + newline);</span>
+<span class="fc" id="L1104">    	}</span>
+    	
+    	// Calculates total number of courses and sections
+<span class="fc" id="L1107">    	int numCourses = 0;</span>
+<span class="fc" id="L1108">    	int numSections = 0;</span>
+<span class="fc bfc" id="L1109" title="All 2 branches covered.">    	for (Course c : v) {</span>
+<span class="fc" id="L1110">    		numSections += c.getNumSections();</span>
+<span class="pc bfc" id="L1111" title="All 2 branches covered.">    		for(int i = 0; i &lt; c.getNumSlots(); ++i) {</span>
+<span class="fc bfc" id="L1112" title="All 2 branches covered.">    			if (c.getSection(i).getCode().charAt(0) == 'L' ||</span>
+<span class="pc bpc" id="L1113" title="1 of 2 branches missed.">    					c.getSection(i).getCode().charAt(0) == 'T' ||</span>
+<span class="nc bnc" id="L1114" title="All 2 branches missed.">    					c.getSection(i).getCode().substring(0,1) == &quot;LA&quot;) {</span>
+<span class="fc" id="L1115">    				++numCourses;</span>
+<span class="fc" id="L1116">    				break;</span>
+    			}
+    		}
+<span class="fc" id="L1119">    	}</span>
+    	
+    	// Print total number of sections
+<span class="fc" id="L1122">    	String secNum = &quot;Total Number of different sections in this search: &quot; + Integer.toString(numSections) + &quot;\n&quot;;</span>
+<span class="fc" id="L1123">    	textAreaConsole.setText(textAreaConsole.getText() + &quot;\n&quot; + secNum);</span>
+    	
+    	// Print total number of courses
+<span class="fc" id="L1126">    	String num = &quot;Total Number of Courses in this search: &quot; + Integer.toString(numCourses) + &quot;\n&quot;;</span>
+<span class="fc" id="L1127">    	textAreaConsole.setText(textAreaConsole.getText() + &quot;\n&quot; + num);</span>
+    	
+    	// Print instructors on the console
+<span class="fc" id="L1130">    	String line = &quot;Instructors who has teaching assignment this term but does not need to teach at Tu 3:10pm: \n&quot;;</span>
+<span class="fc bfc" id="L1131" title="All 2 branches covered.">    	while(!instructors.isEmpty()) {</span>
+<span class="fc" id="L1132">    		line += &quot;\&quot;&quot; + instructors.remove() + &quot;\&quot;, &quot;;</span>
+    	}
+<span class="fc" id="L1134">    	textAreaConsole.setText(textAreaConsole.getText() + &quot;\n&quot; + line);</span>
+    	
+    	
+    	
+    	
+    	//Add a random block on Saturday
+<span class="fc" id="L1140">    	AnchorPane ap = (AnchorPane)tabTimetable.getContent();</span>
+<span class="fc" id="L1141">    	Label randomLabel = new Label(&quot;COMP1022\nL1&quot;);</span>
+<span class="fc" id="L1142">    	Random r = new Random();</span>
+<span class="fc" id="L1143">    	double start = (r.nextInt(10) + 1) * 20 + 40;</span>
+
+<span class="fc" id="L1145">    	randomLabel.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));</span>
+<span class="fc" id="L1146">    	randomLabel.setLayoutX(600.0);</span>
+<span class="fc" id="L1147">    	randomLabel.setLayoutY(start);</span>
+<span class="fc" id="L1148">    	randomLabel.setMinWidth(100.0);</span>
+<span class="fc" id="L1149">    	randomLabel.setMaxWidth(100.0);</span>
+<span class="fc" id="L1150">    	randomLabel.setMinHeight(60);</span>
+<span class="fc" id="L1151">    	randomLabel.setMaxHeight(60);</span>
+    
+<span class="fc" id="L1153">    	ap.getChildren().addAll(randomLabel);</span>
+    	
+    	
+    	
+<span class="fc" id="L1157">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
